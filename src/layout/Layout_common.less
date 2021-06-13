@@ -1,0 +1,99 @@
+// @import '../../common.less';
+
+.header-logo {
+    float: left;
+    overflow: hidden;
+    padding: 8px;
+
+    img {
+        display: block;
+        height: 100%;
+        cursor: pointer;
+    }
+}
+
+.header {
+    padding-left: 0px;
+    padding-right: 0px;
+    // position: 'fixed';
+    // z-index: 1;
+    width: 100%;
+    display: flex;
+}
+
+.content {
+    overflow-x: auto;
+}
+
+.header-search-bar {
+    flex: 0.5 0 auto;
+    align-self: center;
+    margin: 0 auto;
+}
+
+.header-search-bar .search-input .ant-select,
+.header-search-bar .search-input .ant-select .anticon {
+    color: white;
+}
+
+.header-menu {
+    flex: auto 0 auto;
+}
+
+.footer {
+    display: flex;
+    background: black;
+    color: white;
+}
+
+.footer-col {
+    flex: 1 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.footer-row-main {
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+.header-user-info {
+    // float: right;
+    display: flex;
+    line-height: normal;
+    align-items: center;
+    gap: 10px;
+    height: 100%;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.header-user-info-details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+.header-user-info-details-name {
+    font-weight: bold;
+}
+
+.header-user-info-details-email {
+    font-style: italic;
+}
+
+.header-user {
+    display: flex;
+    padding: 5px;
+    height: 100%;
+    float: right;
+    gap: 10px;
+    align-items: center;
+}
+
+.layout-content {
+}
+
+.layout-content-padded {
+    padding: 16px;
+}
