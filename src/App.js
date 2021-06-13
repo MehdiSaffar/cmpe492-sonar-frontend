@@ -42,7 +42,7 @@ export default function App(props) {
             console.log('App:_initApp:start')
             setLoading(true)
             try {
-                api.request.interceptors.use(async request => {
+                api.interceptors.request.use(async request => {
                     const token = await getAccessTokenSilently()
                     console.log('axios token', token)
                     if (token) request.headers.authorization = `Bearer ${token}`
