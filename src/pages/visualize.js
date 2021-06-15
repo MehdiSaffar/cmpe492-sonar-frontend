@@ -6,10 +6,9 @@ import React, { useEffect, useState } from 'react'
 
 import api from '../api'
 import Graph from '../comp/Graph'
-// import Render from '../comp/Render'
 import { useAppContext } from '../context/AppContext'
-import { useRouter } from '../hooks/hooks'
-import { useDebouncedState } from '../hooks/hooks'
+import { useRouter } from '../hooks'
+import { useDebouncedState } from '../hooks'
 import { range } from '../utils'
 
 const parseQuery = url => {
@@ -29,7 +28,6 @@ function _Visualize(props) {
     const [connectedComponentCount, setConnectedComponentCount, _connectedComponentCount] = useDebouncedState(Infinity)
 
     useEffect(() => {
-        console.log('viz')
         ;(async () => {
             setIsGraphReady(false)
             try {

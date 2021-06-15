@@ -2,23 +2,25 @@ import './dashboard.less'
 
 import { InboxOutlined } from '@ant-design/icons'
 import FileReader from '@tanker/file-reader'
-import { Button, Modal, notification, Table, Tag, Upload } from 'antd'
+import { Button, Form, Input, Modal, notification, Table, Tag, Upload } from 'antd'
 // import router from 'next/router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
+import api from '../api'
 import StatusTag from '../comp/StatusTag'
-import { useShow } from '../hooks/hooks'
-import { parseDoiList, sleep } from '../utils'
+import { useShow } from '../hooks'
+import { useApi, useRouter } from '../hooks'
+import { callApi, etv, parseDoiList, sleep } from '../utils'
 
 const { Dragger } = Upload
 
-const columns = [
+const columns = ({ onDeleteClicked, deleteLoading = false } = {}) => [
     {
         title: 'Status',
         dataIndex: 'status',
         key: 'status',
         render: status => {
-            return <StatusTag status={status} />
+            return <StatusTag type={'article_list'} status={status} />
         }
     },
     {
@@ -39,11 +41,12 @@ const columns = [
     {
         title: 'Actions',
         key: 'actions',
-        render: () => {
+        render: row => {
             return (
                 <div>
-                    <Button>Edit</Button>
-                    <Button danger>Delete</Button>
+                    <Button danger loading={deleteLoading} onClick={onDeleteClicked(row.id)}>
+                        Delete
+                    </Button>
                 </div>
             )
         }
@@ -53,37 +56,31 @@ const columns = [
 export function CreateDOIListModal({ onOk, onCancel }) {
     const [loading, setLoading] = useState(false)
     const [list, setList] = useState(undefined)
+    const [title, setTitle] = useState(undefined)
 
     const uploadProps = {
         name: 'file',
+        beforeUpload: () => false,
         maxCount: 1,
-        async onChange(info) {
-            if (!info.file) return
-
-            if (info.file.status === 'done') {
-                console.log('info', info)
-                const reader = new FileReader(info.file.originFileObj)
-                const text = await reader.readAsText('UTF-8')
-                const doiList = parseDoiList(text)
-                setList(doiList)
-            }
+        async onChange({ file }) {
+            const reader = new FileReader(file)
+            const text = await reader.readAsText('UTF-8')
+            const doiList = parseDoiList(text)
+            setList(doiList)
         }
     }
 
-    const ready = list !== undefined && list.length
+    const ready = list !== undefined && list.length && title && title.length >= 3
 
     const _onOk = async () => {
-        setLoading(true)
-        try {
-            await sleep(1000)
-            notification.success({
-                message: 'DOI list uploaded'
-            })
-            onOk()
-        } catch (err) {
-        } finally {
-            setLoading(false)
-        }
+        await callApi('post', '/article-list/create/', {
+            setLoading,
+            data: {
+                title,
+                doi_list: list
+            }
+        })
+        onOk()
     }
 
     return (
@@ -97,6 +94,9 @@ export function CreateDOIListModal({ onOk, onCancel }) {
                 disabled: !ready
             }}
         >
+            <Form.Item label="Title">
+                <Input value={title} onChange={etv(setTitle)} />
+            </Form.Item>
             <Dragger {...uploadProps} className="doi-list-upload">
                 <p className="ant-upload-drag-icon">
                     <InboxOutlined />
@@ -110,8 +110,8 @@ export function CreateDOIListModal({ onOk, onCancel }) {
             {list !== undefined && !list.length && (
                 <p>You seem to have uploaded an empty file. We couldn't find any doi</p>
             )}
-            {ready && <p>You are about to upload {list.length} DOIs</p>}
-            {ready && (
+            {list && list.length && <p>You are about to upload {list.length} DOIs</p>}
+            {list && list.length && (
                 <ul className="doi-list-upload-list">
                     {list.map((doi, index) => {
                         return (
@@ -127,11 +127,31 @@ export function CreateDOIListModal({ onOk, onCancel }) {
 }
 
 export default function Dashboard(props) {
-    const { data } = props
+    const router = useRouter()
+
+    const [deleteLoading, setDeleteLoading] = useState(false)
+
+    const [data, loading, refresh] = useApi('get', '/article-lists/', {
+        processData: data => data.result
+    })
+
     const [visible, show, hide] = useShow(false)
 
+    const onOk = () => {
+        refresh()
+        hide()
+    }
+
     const onDoiListClick = doiList => event => {
-        // router.push(`/dataset?id=${doiList.id}`)
+        router.push(`/dataset/${doiList.id}`)
+    }
+
+    const onDeleteClicked = id => async () => {
+        await callApi('delete', `/article-list/${id}/delete/`, {
+            failThrough: true,
+            setLoading: setDeleteLoading
+        })
+        refresh()
     }
 
     return (
@@ -144,39 +164,17 @@ export default function Dashboard(props) {
                 </div>
             </div>
             <Table
-                onRow={(record, rowIndex) => {
+                loading={loading}
+                onRow={record => {
                     return {
                         onClick: onDoiListClick(record) // click row
                     }
                 }}
                 dataSource={data}
-                columns={columns}
+                columns={columns({ onDeleteClicked, deleteLoading })}
                 id={'id'}
             ></Table>
-            {visible && <CreateDOIListModal onOk={hide} onCancel={hide} />}
+            {visible && <CreateDOIListModal onOk={onOk} onCancel={hide} />}
         </div>
     )
-}
-
-Dashboard.getInitialProps = () => {
-    const dataSource = [
-        {
-            id: 1,
-            status: 'processing',
-            title: 'Articles on Biology',
-            owner: 'Mehdi Saffar',
-            articles: 250
-        },
-        {
-            id: 2,
-            status: 'ready',
-            title: 'Popular COVID papers',
-            owner: 'Umut Oksuz',
-            articles: 1542
-        }
-    ]
-
-    return {
-        data: dataSource
-    }
 }

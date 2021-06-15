@@ -1,9 +1,9 @@
-// import './dataset.less'
+import './dataset.less'
 
 import { Button, Table } from 'antd'
 
-// import router from 'next/router'
 import StatusTag from '../comp/StatusTag'
+import { useApi, useRouter } from '../hooks'
 
 const columns = [
     {
@@ -11,8 +11,13 @@ const columns = [
         dataIndex: 'status',
         key: 'status',
         render: status => {
-            return <StatusTag status={status} />
+            return <StatusTag type={'article'} status={status} />
         }
+    },
+    {
+        title: 'ID',
+        dataIndex: 'id',
+        key: 'id'
     },
     {
         title: 'DOI',
@@ -25,18 +30,31 @@ const columns = [
         key: 'title'
     },
     {
-        title: 'Date',
-        dataIndex: 'date',
-        key: 'date'
+        title: 'Created at',
+        dataIndex: 'created_date',
+        key: 'created_date'
+    },
+    {
+        title: 'Fetched at',
+        dataIndex: 'fetched_date',
+        key: 'fetched_date'
+    },
+    {
+        title: 'Tries',
+        dataIndex: 'try_count',
+        key: 'try_count'
     }
 ]
 
 export default function Dataset(props) {
-    const { dataset } = props
+    const router = useRouter()
+
+    const [dataset, loading] = useApi('get', `/article-list/${router.match.params.id}`)
 
     const onClickVisualize = () => {
-        // router.push('/visualize')
+        router.push(`/configure/${router.match.params.id}`)
     }
+
     return (
         <div>
             <div className="dataset-pretable">
@@ -46,35 +64,8 @@ export default function Dataset(props) {
                     </Button>
                 </div>
             </div>
-            <h1>{dataset.title}</h1>
-            <Table dataSource={dataset.articles} columns={columns} id={'id'}></Table>
+            <h1>{dataset?.title ?? 'Loading...'}</h1>
+            <Table loading={loading} dataSource={dataset} columns={columns} id={'id'}></Table>
         </div>
     )
 }
-
-// Dataset.getInitialProps = () => {
-//     return {
-//         dataset: {
-//             id: 1,
-//             status: 'processing',
-//             title: 'Articles on Biology',
-//             owner: 'Mehdi Saffar',
-//             articles: [
-//                 {
-//                     id: 1,
-//                     doi: '10.1038/s41467-019-13850-7',
-//                     title: 'Computer science: an overview',
-//                     status: 'ready',
-//                     date: new Date('12/03/2021')
-//                 },
-//                 {
-//                     id: 2,
-//                     doi: '10.1038/s41467-019-13850-7',
-//                     title: 'Scientific methods in computer science',
-//                     status: 'processing',
-//                     date: new Date('11/03/2021')
-//                 }
-//             ]
-//         }
-//     }
-// }

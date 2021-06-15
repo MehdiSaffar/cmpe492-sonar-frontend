@@ -1,4 +1,7 @@
+import { notification } from 'antd'
 import doiRegex from 'doi-regex'
+
+import api from './api'
 
 export function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms))
@@ -67,4 +70,73 @@ export function range(start, stop, step) {
 
 export function getRange(arr) {
     return [Math.min(...arr), Math.max(...arr)]
+}
+
+export const nop = () => {}
+export const identity = x => x
+
+export async function callApi(
+    type,
+    url,
+    {
+        failThrough = false,
+        data = undefined,
+        setLoading = nop,
+        showErrorNotification = true,
+        showSuccessNotification = true,
+        successNotification = 'Changes are saved',
+        errorNotification = 'Failed to save changes'
+    } = {}
+) {
+    try {
+        setLoading(true)
+        await api[type](url, data)
+        if (showSuccessNotification) {
+            notification.success({ description: successNotification })
+        }
+    } catch (error) {
+        if (showErrorNotification) {
+            notification.error({ description: errorNotification })
+        }
+
+        if (failThrough) {
+            setLoading(false)
+            throw error
+        }
+    } finally {
+        setLoading(false)
+    }
+}
+
+export const etv = fn => event => fn(event.target.value)
+
+export const statusMappings = {
+    article_list: {
+        phase_1: {
+            displayName: 'Phase 1',
+            color: 'cyan'
+        },
+        phase_2: {
+            displayName: 'Phase 2',
+            color: 'blue'
+        },
+        done: {
+            displayName: 'Done',
+            color: 'green'
+        }
+    },
+    article: {
+        to_be_fetched: {
+            displayName: 'Fetching',
+            color: 'cyan'
+        },
+        to_be_processed: {
+            displayName: 'Processing',
+            color: 'blue'
+        },
+        done: {
+            displayName: 'Done',
+            color: 'green'
+        }
+    }
 }

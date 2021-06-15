@@ -1,7 +1,53 @@
+import { notification } from 'antd'
 import queryString from 'query-string'
 import { useCallback, useEffect, useState } from 'react'
 import { useMemo } from 'react'
 import { useHistory, useLocation, useParams, useRouteMatch } from 'react-router-dom'
+
+import api from './api'
+import { identity, nop } from './utils'
+
+export function useApi(
+    type,
+    url,
+    {
+        showErrorNotification = true,
+        showSuccessNotification = true,
+        // processData = identity,
+        processData = data => data.result,
+        successNotification = 'Fetched data successfully',
+        errorNotification = 'Failed to fetch',
+        deps = []
+    } = {}
+) {
+    const [refreshId, setRefreshId] = useState(0)
+    const [loading, setLoading] = useState(true)
+    const [data, setData] = useState()
+    const refresh = useCallback(() => setRefreshId(x => x + 1), [])
+
+    useEffect(() => {
+        async function fn() {
+            try {
+                setLoading(true)
+                const { data } = await api[type](url)
+                setData(processData(data))
+                if (showSuccessNotification) {
+                    notification.success({ description: successNotification })
+                }
+            } catch (error) {
+                if (showErrorNotification) {
+                    notification.error({ description: errorNotification })
+                }
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        fn()
+    }, [...deps, refreshId])
+
+    return [data, loading, refresh]
+}
 
 export function useDebouncedState(initValue, delay = 1000) {
     // State and setters for debounced value

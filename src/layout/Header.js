@@ -6,7 +6,7 @@ import { Avatar, Button, Dropdown, Layout, Menu } from 'antd'
 import { Link } from 'react-router-dom'
 
 import { useAppContext } from '../context/AppContext'
-import { useRouter } from '../hooks/hooks'
+import { useRouter } from '../hooks'
 
 export const GuestHeaderContent = () => {
     return (

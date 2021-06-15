@@ -4,7 +4,7 @@ import { useAuth0 } from '@auth0/auth0-react'
 import { Button } from 'antd'
 
 import { useAppContext } from '../context/AppContext'
-import { useRouter } from '../hooks/hooks'
+import { useRouter } from '../hooks'
 
 export default function Home() {
     const router = useRouter()

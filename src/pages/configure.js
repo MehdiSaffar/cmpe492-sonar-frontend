@@ -1,19 +1,18 @@
 import './configure.less'
 
 import { Button, Checkbox } from 'antd'
-// import { useRouter } from 'next/router'
 import qs from 'query-string'
 import React, { useState } from 'react'
 
 import api from '../api'
 import { useAppContext } from '../context/AppContext'
-import { useRouter } from '../hooks/hooks'
+import { useRouter } from '../hooks'
 import { edgeOptions, edgeSatisfiesConstraints, nodeOptions } from '../utils'
 
 export default function Configure(props, b, c) {
     const { isPyReady, py } = useAppContext()
     const router = useRouter()
-    console.log('router', router)
+
     // if (!isPyReady) {
     //     return <div>Please wait until Python is ready</div>
     // }

@@ -1,13 +1,11 @@
 import { Tag } from 'antd'
 import React from 'react'
 
-const color = {
-    processing: 'blue',
-    ready: 'green',
-    failed: 'red',
-    fetching: 'cyan'
-}
+import { statusMappings } from '../utils'
 
-export default function StatusTag({ status }) {
-    return <Tag color={color[status]}>{status}</Tag>
+export default function StatusTag({ type, status }) {
+    const _type = statusMappings[type] ?? {}
+    const _props = _type[status] ?? { color: 'gray', displayName: status }
+
+    return <Tag color={_props.color}>{_props.displayName}</Tag>
 }

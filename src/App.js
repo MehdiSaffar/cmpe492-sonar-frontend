@@ -30,12 +30,13 @@ const LoadingScreen = () => {
 
 export default function App(props) {
     const auth = useAuth0()
-    console.log('auth', auth)
 
     const { isLoading, isAuthenticated, getAccessTokenSilently } = auth
 
     const { setIsPyReady, setPy } = useAppContext()
     const [loading, setLoading] = useState(false)
+
+    useEffect(console.log, [auth])
 
     useEffect(() => {
         async function _initApp() {
@@ -74,7 +75,7 @@ export default function App(props) {
             }
         }
         _initApp()
-        _initPython()
+        // _initPython()
     }, [])
 
     return (
@@ -87,7 +88,7 @@ export default function App(props) {
                 <MainLayout>
                     <Switch>
                         {isAuthenticated && <Route path="/dashboard" component={Dashboard} />}
-                        {isAuthenticated && <Route path="/dataset" component={Dataset} />}
+                        {isAuthenticated && <Route path="/dataset/:id/" component={Dataset} />}
                         {isAuthenticated && <Route path="/visualize" component={Visualize} />}
                         {isAuthenticated && <Route path="/configure" component={Configure} />}
                         <Route exact path="/" component={Index} />
