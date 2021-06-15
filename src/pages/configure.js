@@ -1,6 +1,6 @@
 import './configure.less'
 
-import { Button, Checkbox } from 'antd'
+import { Button, Checkbox, PageHeader } from 'antd'
 import qs from 'query-string'
 import React, { useState } from 'react'
 
@@ -12,6 +12,7 @@ import { edgeOptions, edgeSatisfiesConstraints, nodeOptions } from '../utils'
 export default function Configure(props, b, c) {
     const { isPyReady, py } = useAppContext()
     const router = useRouter()
+    const id = router.match.params.id
 
     // if (!isPyReady) {
     //     return <div>Please wait until Python is ready</div>
@@ -78,6 +79,16 @@ export default function Configure(props, b, c) {
 
     return (
         <div className="configure">
+            <PageHeader
+                title={`Configure graph of article list ${id}`}
+                subTitle="Here you can find the articles of this list"
+                onBack={router.history.goBack}
+                extra={[
+                    <Button key="1" type="primary" disabled={!(isPyReady && canSubmit)} onClick={onConfirm}>
+                        Visualize
+                    </Button>
+                ]}
+            />
             {state}
             <br />
             Please select the nodes and edges you would like to visualize <br />

@@ -1,4 +1,5 @@
 import { notification } from 'antd'
+import { formatDistanceToNow, isValid } from 'date-fns'
 import doiRegex from 'doi-regex'
 
 import api from './api'
@@ -139,4 +140,38 @@ export const statusMappings = {
             color: 'green'
         }
     }
+}
+
+export function formatArticleListResponse(r) {
+    r = r.result
+    r.forEach(a => {
+        a.title = a.title === '' ? null : a.title
+        a.created_date = newDateOrKeep(a.created_date)
+        a.fetched_date = newDateOrKeep(a.fetched_date)
+        a.processed_date = newDateOrKeep(a.processed_date)
+    })
+    return r
+}
+
+export function newDateOrKeep(d) {
+    if (d === null || d === undefined) {
+        return d
+    }
+    return new Date(d)
+}
+
+export function renderDateToNow(d) {
+    if (d === null || d === undefined) {
+        return 'Missing date'
+    }
+
+    if (!isValid(d)) {
+        return 'Missing/Invalid date'
+    }
+
+    return formatDistanceToNow(d)
+}
+
+export function returnOr(x, s = 'Missing') {
+    return x ?? s
 }

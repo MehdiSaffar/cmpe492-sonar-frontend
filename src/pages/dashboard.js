@@ -2,7 +2,7 @@ import './dashboard.less'
 
 import { InboxOutlined } from '@ant-design/icons'
 import FileReader from '@tanker/file-reader'
-import { Button, Form, Input, Modal, notification, Table, Tag, Upload } from 'antd'
+import { Button, Form, Input, Modal, notification, PageHeader, Table, Tag, Upload } from 'antd'
 // import router from 'next/router'
 import { useEffect, useState } from 'react'
 
@@ -156,6 +156,11 @@ export default function Dashboard(props) {
 
     return (
         <div>
+            <PageHeader
+                title="Dashboard"
+                subTitle="Here you can find all your submitted article lists"
+                onBack={router.history.goBack}
+            />
             <div className="dashboard-pretable">
                 <div className="dashboard-pretable-buttons">
                     <Button onClick={show} type="primary">

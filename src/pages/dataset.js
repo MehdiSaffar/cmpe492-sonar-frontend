@@ -1,9 +1,10 @@
 import './dataset.less'
 
-import { Button, Table } from 'antd'
+import { Button, PageHeader, Table } from 'antd'
 
 import StatusTag from '../comp/StatusTag'
 import { useApi, useRouter } from '../hooks'
+import { formatArticleListResponse, renderDateToNow, returnOr } from '../utils'
 
 const columns = [
     {
@@ -17,54 +18,77 @@ const columns = [
     {
         title: 'ID',
         dataIndex: 'id',
-        key: 'id'
+        key: 'id',
+        render: returnOr
     },
     {
         title: 'DOI',
         dataIndex: 'doi',
-        key: 'doi'
+        key: 'doi',
+        render: returnOr
     },
     {
         title: 'Title',
         dataIndex: 'title',
-        key: 'title'
+        key: 'title',
+        render: returnOr
     },
     {
         title: 'Created at',
         dataIndex: 'created_date',
-        key: 'created_date'
+        key: 'created_date',
+        render: renderDateToNow
     },
     {
         title: 'Fetched at',
         dataIndex: 'fetched_date',
-        key: 'fetched_date'
+        key: 'fetched_date',
+        render: renderDateToNow
+    },
+    {
+        title: 'Processed at',
+        dataIndex: 'processed_date',
+        key: 'processed_date',
+        render: renderDateToNow
     },
     {
         title: 'Tries',
         dataIndex: 'try_count',
-        key: 'try_count'
+        key: 'try_count',
+        render: returnOr
     }
 ]
 
 export default function Dataset(props) {
     const router = useRouter()
+    const id = router.match.params.id
 
-    const [dataset, loading] = useApi('get', `/article-list/${router.match.params.id}`)
+    const [dataset, loading, refresh] = useApi('get', `/article-list/${id}`, {
+        processData: formatArticleListResponse
+    })
+
+    console.log(dataset)
 
     const onClickVisualize = () => {
-        router.push(`/configure/${router.match.params.id}`)
+        router.push(`/configure/${id}`)
     }
 
     return (
         <div>
-            <div className="dataset-pretable">
-                <div className="dataset-pretable-buttons">
-                    <Button onClick={onClickVisualize} type="primary">
+            <PageHeader
+                title={`Article list ${dataset?.title ?? ''}`}
+                subTitle="Here you can find the articles of this list"
+                onBack={router.history.goBack}
+                extra={[
+                    <Button key="2" onClick={refresh}>
+                        Refresh
+                    </Button>,
+                    <Button key="1" type="primary" onClick={onClickVisualize}>
                         Visualize
                     </Button>
-                </div>
-            </div>
-            <h1>{dataset?.title ?? 'Loading...'}</h1>
+                ]}
+            />
+            <h1>{loading ? 'Loading...' : dataset?.title ?? 'Article List'}</h1>
             <Table loading={loading} dataSource={dataset} columns={columns} id={'id'}></Table>
         </div>
     )

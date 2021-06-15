@@ -36,8 +36,6 @@ export default function App(props) {
     const { setIsPyReady, setPy } = useAppContext()
     const [loading, setLoading] = useState(false)
 
-    useEffect(console.log, [auth])
-
     useEffect(() => {
         async function _initApp() {
             console.log('App:_initApp:start')
@@ -45,11 +43,9 @@ export default function App(props) {
             try {
                 api.interceptors.request.use(async request => {
                     const token = await getAccessTokenSilently()
-                    console.log('axios token', token)
                     if (token) request.headers.authorization = `Bearer ${token}`
                     return request
                 })
-                // init()
             } catch (error) {
                 console.error('App:_initApp:error', error)
             } finally {
@@ -75,7 +71,7 @@ export default function App(props) {
             }
         }
         _initApp()
-        // _initPython()
+        _initPython()
     }, [])
 
     return (
@@ -89,10 +85,10 @@ export default function App(props) {
                     <Switch>
                         {isAuthenticated && <Route path="/dashboard" component={Dashboard} />}
                         {isAuthenticated && <Route path="/dataset/:id/" component={Dataset} />}
-                        {isAuthenticated && <Route path="/visualize" component={Visualize} />}
-                        {isAuthenticated && <Route path="/configure" component={Configure} />}
-                        <Route exact path="/" component={Index} />
-                        <Redirect to="/" />
+                        {isAuthenticated && <Route path="/visualize/:id/" component={Visualize} />}
+                        {isAuthenticated && <Route path="/configure/:id/" component={Configure} />}
+                        {!isAuthenticated && <Route exact path="/" component={Index} />}
+                        <Redirect to={isAuthenticated ? '/dashboard' : '/'} />
                     </Switch>
                 </MainLayout>
             )}
