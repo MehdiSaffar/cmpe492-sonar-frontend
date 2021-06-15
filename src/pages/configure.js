@@ -74,7 +74,7 @@ export default function Configure(props, b, c) {
             skipEmptyString: true
         })
 
-        router.push(`/visualize?${queryString}`)
+        router.push(`/visualize/${id}/?${queryString}`)
     }
 
     return (
