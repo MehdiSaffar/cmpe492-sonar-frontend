@@ -153,6 +153,38 @@ export function formatArticleListResponse(r) {
     return r
 }
 
+export function formatArticleListGraphResponse(r) {
+    r.nodes.forEach(n => {
+        delete n.article_list
+
+        const info = n.specific_information
+        n.info = info
+        delete n.specific_information
+
+        const key = n.object_key
+        n.key = key
+        delete n.object_key
+
+        const type = n.node_type
+        n.type = type
+        delete n.node_type
+    })
+
+    r.edges.forEach(e => {
+        delete e.article_list
+
+        const info = e.specific_information
+        e.info = info
+        delete e.specific_information
+
+        const type = e.node_type
+        e.type = type
+        delete e.node_type
+    })
+
+    return r
+}
+
 export function newDateOrKeep(d) {
     if (d === null || d === undefined) {
         return d

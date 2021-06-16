@@ -1,7 +1,6 @@
 import { notification } from 'antd'
 import queryString from 'query-string'
-import { useCallback, useEffect, useState } from 'react'
-import { useMemo } from 'react'
+import { useMemo, useCallback, useEffect, useState } from 'react'
 import { useHistory, useLocation, useParams, useRouteMatch } from 'react-router-dom'
 
 import api from './api'
@@ -108,4 +107,39 @@ export function useRouter() {
             history
         }
     }, [params, match, location, history])
+}
+
+export function useAsyncMemo(factory, deps, initial): T {
+    const [loading, setLoading] = useState(true)
+    const [val, setVal] = useState(initial)
+
+    useEffect(() => {
+        let cancel = false
+
+        const promise = factory()
+
+        if (promise === undefined || promise === null) {
+            setLoading(false)
+            return
+        }
+
+        setLoading(true)
+        promise
+            .then(val => {
+                setLoading(false)
+                if (!cancel) {
+                    setVal(val)
+                }
+            })
+            .catch(err => {
+                setLoading(false)
+                throw err
+            })
+
+        return () => {
+            cancel = true
+        }
+    }, deps)
+
+    return [val, loading]
 }
