@@ -193,7 +193,7 @@ function Graph({ size, graph, params }) {
                     return color
                 }
 
-                if (!isNodeHigh(node)) {
+                if (nodeProps[highNode].component === node.component && !isNodeHigh(node)) {
                     return hexOpacity(color, 0.3)
                 }
 
@@ -234,7 +234,10 @@ function Graph({ size, graph, params }) {
                     return color
                 }
 
-                if (!isLinkHigh(link)) {
+                if (
+                    nodeProps[highNode].component === nodeProps[getLinkSourceIdSafely(link)].component &&
+                    !isLinkHigh(link)
+                ) {
                     return hexOpacity(color, 0.3)
                 }
 
