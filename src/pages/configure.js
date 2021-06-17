@@ -82,7 +82,7 @@ export default function Configure(props, b, c) {
             <PageHeader
                 title={`Configure graph of article list ${id}`}
                 subTitle="Here you can find the articles of this list"
-                onBack={router.history.goBack}
+                onBack={() => router.history.push(`/dataset/${id}`)}
                 extra={[
                     <Button key="1" type="primary" disabled={!(isPyReady && canSubmit)} onClick={onConfirm}>
                         Visualize

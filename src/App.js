@@ -88,7 +88,7 @@ export default function App(props) {
                         {isAuthenticated && <Route path="/visualize/:id/" component={Visualize} />}
                         {isAuthenticated && <Route path="/configure/:id/" component={Configure} />}
                         {!isAuthenticated && <Route exact path="/" component={Index} />}
-                        {/* <Redirect to={isAuthenticated ? '/dashboard' : '/'} /> */}
+                        <Redirect to={isAuthenticated ? '/dashboard' : '/'} />
                     </Switch>
                 </MainLayout>
             )}

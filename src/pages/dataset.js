@@ -78,7 +78,7 @@ export default function Dataset(props) {
             <PageHeader
                 title={`Article list ${dataset?.title ?? ''}`}
                 subTitle="Here you can find the articles of this list"
-                onBack={router.history.goBack}
+                onBack={() => router.history.push('/dashboard')}
                 extra={[
                     <Button key="2" onClick={refresh}>
                         Refresh

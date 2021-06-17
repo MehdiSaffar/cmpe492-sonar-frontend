@@ -5,6 +5,7 @@ import qs from 'query-string'
 import React, { useEffect, useState } from 'react'
 
 import api from '../api'
+import _data from '../assets/graph.small.json'
 import Graph from '../comp/Graph'
 import { useAppContext } from '../context/AppContext'
 import { useApi, useAsyncMemo, useDebouncedState, useRouter } from '../hooks'
@@ -58,6 +59,10 @@ const formItemLayout = {
     }
 }
 
+const data = (() => {
+    return _data
+})()
+
 export default function Visualize(props) {
     const { py, isPyReady } = useAppContext()
     const router = useRouter()
@@ -66,15 +71,29 @@ export default function Visualize(props) {
     const query = parseQuery(router.location.search)
 
     const [form] = Form.useForm()
-    const [params, setParams] = useState()
+    const initialValues = {
+        connectedComponentCount: 1,
+        colorNodeBy: 'type',
+        colorEdgeBy: 'component',
+        metrics: {
+            degree_centrality: 1,
+            eigenvector_centrality: 1,
+            closeness_centrality: 1,
+            betweenness_centrality: 1
+        }
+    }
 
-    const [data, dataLoading] = useApi('get', `/article-list/${id}/graph/`, {
-        processData: formatArticleListGraphResponse
-    })
+    const [params, setParams] = useState(initialValues)
+    const dataLoading = false
+
+    // const [data, dataLoading] = useApi('get', `/article-list/${id}/graph/`, {
+    //     processData: formatArticleListGraphResponse
+    // })
 
     const [graph, graphLoading] = useAsyncMemo(async () => {
         const { nodes, edges, removeIsolates } = query
-        if (!data) return
+        // if (!data) return
+
         if (!isPyReady) return
 
         // setMsg('Loading graph into NetworkX')
@@ -173,24 +192,7 @@ export default function Visualize(props) {
                 <Graph graph={graph} params={params} />
             </div>
             <div className="side">
-                <Form
-                    form={form}
-                    {...formItemLayout}
-                    preserve
-                    onFinish={setParams}
-                    initialValues={{
-                        // connectedComponentCount: graph.connectedComponentCount,
-                        connectedComponentCount: 1,
-                        colorNodeBy: 'type',
-                        colorEdgeBy: 'component',
-                        metrics: {
-                            degree_centrality: 1,
-                            eigenvector_centrality: 1,
-                            closeness_centrality: 1,
-                            betweenness_centrality: 1
-                        }
-                    }}
-                >
+                <Form form={form} {...formItemLayout} preserve onFinish={setParams} initialValues={initialValues}>
                     Connected components
                     <Form.Item name={'connectedComponentCount'} label="Top Conn. Comps">
                         <Slider

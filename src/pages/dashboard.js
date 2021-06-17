@@ -159,20 +159,18 @@ export default function Dashboard(props) {
             <PageHeader
                 title="Dashboard"
                 subTitle="Here you can find all your submitted article lists"
-                onBack={router.history.goBack}
-            />
-            <div className="dashboard-pretable">
-                <div className="dashboard-pretable-buttons">
-                    <Button onClick={show} type="primary">
+                extra={[
+                    <Button key={'1'} type="primary" onClick={show}>
                         Create
                     </Button>
-                </div>
-            </div>
+                ]}
+            />
             <Table
                 loading={loading}
                 onRow={record => {
                     return {
-                        onClick: onDoiListClick(record) // click row
+                        onClick: onDoiListClick(record), // click row
+                        style: { cursor: 'pointer' }
                     }
                 }}
                 dataSource={data}

@@ -72,7 +72,7 @@ class App:
         for node in nodes:
             id = node['id']
             other = {k: v for k, v in node.items() if k not in ['id']}
-            _nodes.append((id, node))
+            _nodes.append((id, other))
 
         return _nodes
 
@@ -90,8 +90,11 @@ class App:
     def load_graph(self, js):
         self.g = nx.Graph()
 
-        self.g.add_nodes_from(self.format_nodes_for_nx(js['nodes']))
-        self.g.add_edges_from(self.format_edges_for_nx(js['edges']))
+        self.g.add_nodes_from(js['nodes'])
+        self.g.add_edges_from(js['edges'])
+
+        # self.g.add_nodes_from(self.format_nodes_for_nx(js['nodes']))
+        # self.g.add_edges_from(self.format_edges_for_nx(js['edges']))
 
     def get_nodes(self):
         return list(self.g.nodes(data=True))

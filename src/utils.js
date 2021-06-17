@@ -1,6 +1,8 @@
 import { notification } from 'antd'
+import ColorHash from 'color-hash'
 import { formatDistanceToNow, isValid } from 'date-fns'
 import doiRegex from 'doi-regex'
+import objectHash from 'object-hash'
 
 import api from './api'
 
@@ -206,4 +208,18 @@ export function renderDateToNow(d) {
 
 export function returnOr(x, s = 'Missing') {
     return x ?? s
+}
+
+const colorHash = new ColorHash()
+
+export const getUniqueColor = o => {
+    if (typeof o === 'string') {
+        return colorHash.hex(o)
+    }
+
+    if (typeof o === 'number') {
+        return colorHash.hex(o.toString())
+    }
+
+    return colorHash.hex(objectHash(o))
 }
