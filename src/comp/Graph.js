@@ -244,7 +244,12 @@ function Graph({ size, graph, params }) {
                 return color
             }
 
+            const makeSlightlyTransparent = color => {
+                return hexOpacity(color, 0.6)
+            }
+
             let color = getLinkColor(link)
+            color = makeSlightlyTransparent(color)
             color = differentiateHighLinks(link, color)
             color = hexToRgba(color)
             return color
@@ -342,7 +347,7 @@ function Graph({ size, graph, params }) {
             linkWidth={linkWidth}
             onNodeHover={onNodeHover}
             nodeResolution={1}
-            cooldownTicks={30}
+            cooldownTicks={50}
         />
     )
 }
