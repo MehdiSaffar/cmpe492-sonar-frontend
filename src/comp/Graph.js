@@ -12,16 +12,30 @@ import ellipsis from 'text-ellipsis'
 import { useSet } from '../hooks'
 import { getRange, getUniqueColor } from '../utils'
 
-// const nodeColor = {
-//     article: 'blue',
-//     author: 'red',
-//     topic: 'gray'
-// }
+const nodeColorMap = {
+    article: '#0000FF',
+    author: '#FF0000',
+    topic: '#696969'
+}
 
 // const edgeColor = {
 //     author_of: 'orange',
 //     topic_of: 'pink'
 // }
+
+const getNodeName = node => {
+    if (node.type === 'article') {
+        return node.info.title
+    }
+
+    if (node.type === 'author') {
+        return node.info.full_name
+    }
+
+    if (node.type === 'topic') {
+        return node.key
+    }
+}
 
 const toReactForceGraph = ({ nodes, edges, ...other }) => {
     return {
@@ -143,7 +157,7 @@ function Graph({ size, graph, params, onClickNode }) {
     }, [graphData.links])
 
     const [highNode, setHighNode] = useState()
-    // const [highLink, setHighLink] = useState()
+    const [highLink, setHighLink] = useState()
 
     const [highNodes, highNodesFns] = useSet(new Set())
     // const [highLinks, highLinksFns] = useSet(new Set())
@@ -168,10 +182,12 @@ function Graph({ size, graph, params, onClickNode }) {
             const target = getLinkTargetIdSafely(link)
 
             return (
-                (highNode === source && highNodesFns.has(target)) || (highNode === target && highNodesFns.has(source))
+                (highNode === source && highNodesFns.has(target)) ||
+                (highNode === target && highNodesFns.has(source)) ||
+                (highLink && source === getLinkSourceIdSafely(highLink) && target === getLinkTargetIdSafely(highLink))
             )
         },
-        [highNode, highNodes]
+        [highNode, highNodes, highLink]
     )
 
     const isNodeHigh = useCallback(node => highNode === node.id || highNodesFns.has(node.id), [highNode, highNodes])
@@ -182,7 +198,8 @@ function Graph({ size, graph, params, onClickNode }) {
         node => {
             const getNodeColor = node => {
                 if (params.colorNodeBy === 'type') {
-                    return getUniqueColor(node.type)
+                    // return getUniqueColor(node.type)
+                    return nodeColorMap[node.type]
                 }
 
                 if (params.colorNodeBy === 'component') {
@@ -263,32 +280,6 @@ function Graph({ size, graph, params, onClickNode }) {
         [params.colorEdgeBy, nodeProps, isLinkHigh]
     )
 
-    // const linkDirectionalParticles = useCallback(
-    //     link => {
-    //         const source = getLinkSourceIdSafely(link)
-    //         const target = getLinkTargetIdSafely(link)
-
-    //         if (highNode === source && highNodesFns.has(target)) return 1
-    //         if (highNode === target && highNodesFns.has(source)) return 1
-
-    //         return 0
-    //     },
-    //     [highNode, highNodes]
-    // )
-
-    // const linkDirectionalParticleSpeed = useCallback(
-    //     link => {
-    //         const source = getLinkSourceIdSafely(link)
-    //         const target = getLinkTargetIdSafely(link)
-
-    //         if (highNode === source && highNodesFns.has(target)) return 0.01
-    //         if (highNode === target && highNodesFns.has(source)) return -0.01
-
-    //         return 0
-    //     },
-    //     [highNode, highNodes]
-    // )
-
     const linkWidth = useCallback(
         link => {
             const width = ((link.count ?? 1) - linkCountMin) / (linkCountMax - linkCountMin)
@@ -299,22 +290,12 @@ function Graph({ size, graph, params, onClickNode }) {
             ret *= isLinkHigh(link) ? 2 : 1
             return ret
         },
-        [graphData, isLinkHigh, linkCountMin, linkCountMax]
+        [graphData, isLinkHigh, linkCountMin, linkCountMax, highLink]
     )
 
     const getLabel = (node, { shorten = true }) => {
         function _1(node) {
-            if (node.type === 'article') {
-                return node.info.title
-            }
-
-            if (node.type === 'author') {
-                return node.info.full_name
-            }
-
-            if (node.type === 'topic') {
-                return node.key
-            }
+            return getNodeName(node)
         }
 
         function _2(txt) {
@@ -371,7 +352,8 @@ function Graph({ size, graph, params, onClickNode }) {
             ctx.textAlign = 'center'
             ctx.textBaseline = 'middle'
             // ctx.fillStyle = color
-            ctx.fillStyle = 'black'
+            // ctx.fillStyle = getUniqueColor(node.type)
+            ctx.fillStyle = nodeColorMap[node.type]
             ctx.fillText(label, node.x, node.y)
 
             node.__bckgDimensions = bckgDimensions // to re-use in nodePointerAreaPaint
@@ -386,6 +368,17 @@ function Graph({ size, graph, params, onClickNode }) {
             ctx.fillRect(node.x - bckgDimensions[0] / 2, node.y - bckgDimensions[1] / 2, ...bckgDimensions)
     }, [])
 
+    const linkLabel = useCallback(link => {
+        const source = ellipsis(getNodeName(link.source), 15)
+        const target = ellipsis(getNodeName(link.target), 15)
+
+        return `${source} <-> ${link.type}:${link.count ?? 1} <-> ${target}`
+    })
+
+    const onLinkHover = useCallback(link => {
+        setHighLink(link)
+    })
+
     return (
         <ForceGraph2D
             {...size}
@@ -393,6 +386,7 @@ function Graph({ size, graph, params, onClickNode }) {
             nodeVal={10}
             nodeColor={nodeColor}
             linkColor={linkColor}
+            linkLabel={linkLabel}
             onNodeClick={onClickNode}
             // linkDirectionalParticles={linkDirectionalParticles}
             // linkDirectionalParticleSpeed={linkDirectionalParticleSpeed}
@@ -400,6 +394,7 @@ function Graph({ size, graph, params, onClickNode }) {
             nodePointerAreaPaint={nodePointerAreaPaint}
             linkWidth={linkWidth}
             onNodeHover={onNodeHover}
+            onLinkHover={onLinkHover}
             nodeResolution={1}
             cooldownTicks={50}
         />
