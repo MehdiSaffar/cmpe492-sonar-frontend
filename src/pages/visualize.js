@@ -46,10 +46,10 @@ const colorEdgeByOptions = [
 ]
 
 const metricsOptions = [
-    { value: 'degree_centrality', label: 'degree' },
-    { value: 'eigenvector_centrality', label: 'eigenvector' },
-    { value: 'closeness_centrality', label: 'closeness' },
-    { value: 'betweenness_centrality', label: 'betweenness' }
+    { value: 'degree_centrality', label: 'degree' }
+    // { value: 'eigenvector_centrality', label: 'eigenvector' },
+    // { value: 'closeness_centrality', label: 'closeness' },
+    // { value: 'betweenness_centrality', label: 'betweenness' }
     // { value: 'communicability_centrality', label: 'communicability' },
     // { value: 'load_centrality', label: 'load' },
     // { value: 'subgraph_centrality', label: 'subgraph' },
@@ -78,6 +78,24 @@ function KVPair({ name, children }) {
     )
 }
 
+function NodeInfos({ node }) {
+    return (
+        <>
+            <h1>Info</h1>
+            <KVPair name={'Degree'}>{node.degree}</KVPair>
+            <KVPair name={'Component index'}>{node.component}</KVPair>
+            {metricsOptions.map(({ value, label }) => {
+                return (
+                    <KVPair key={value} name={label}>
+                        {node[value].toFixed(3)}
+                    </KVPair>
+                )
+            })}
+            <KVPair name={'Weighted metric'}>{node.metric.toFixed(3)}</KVPair>
+        </>
+    )
+}
+
 function NodeDetails({ node }) {
     console.log('NodeDetails', node)
     if (!node) {
@@ -92,6 +110,7 @@ function NodeDetails({ node }) {
                 <KVPair name={'Title'}>{node.info.title}</KVPair>
                 <KVPair name={'Cited by count'}>{node.info.cited_by_count}</KVPair>
                 <KVPair name={'Published date'}>{formatDate(node.created_date)}</KVPair>
+                <NodeInfos node={node} />
             </div>
         )
     }
@@ -105,6 +124,7 @@ function NodeDetails({ node }) {
                 <KVPair name={'Citation count'}>{node.info.citation_count}</KVPair>
                 <KVPair name={'Cited by count'}>{node.info.cited_by_count}</KVPair>
                 <KVPair name={'Paper count'}>{node.info.document_count}</KVPair>
+                <NodeInfos node={node} />
             </div>
         )
     }
@@ -114,6 +134,7 @@ function NodeDetails({ node }) {
             <div>
                 <h1>Topic details</h1>
                 <KVPair name={'Name'}>{node.key}</KVPair>
+                <NodeInfos node={node} />
             </div>
         )
     }
@@ -212,6 +233,9 @@ export default function Visualize(props) {
         console.log('finding connected components')
         // setMsg('Finding connected components')
         await py.add_connected_component_attr()
+
+        console.log('adding degrees')
+        await py.add_degree_attrs()
 
         console.log('adding metrics')
         await py.add_metric_attrs()

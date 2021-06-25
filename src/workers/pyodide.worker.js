@@ -141,6 +141,10 @@ export async function add_metric_attrs() {
     app.add_metric_attrs()
 }
 
+export async function add_degree_attrs() {
+    app.add_degree_attrs()
+}
+
 // export async function add_layout_attr() {
 //     app.add_layout_attr()
 // }

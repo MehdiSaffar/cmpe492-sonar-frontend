@@ -91,7 +91,7 @@ const createNodesHashmap = nodes => {
 }
 
 const getLinkSourceIdSafely = link => {
-    if (typeof link.source === 'string') {
+    if (typeof link.source === 'string' || typeof link.source === 'number') {
         return link.source
     }
 
@@ -99,14 +99,14 @@ const getLinkSourceIdSafely = link => {
 }
 
 const getLinkTargetIdSafely = link => {
-    if (typeof link.target === 'string') {
+    if (typeof link.target === 'string' || typeof link.target === 'number') {
         return link.target
     }
 
     return link.target.id
 }
 
-const getAdjList = ({ links }) => {
+const getAdjList = links => {
     const obj = {}
 
     for (let link of links) {
@@ -123,7 +123,7 @@ const getAdjList = ({ links }) => {
 function Graph({ size, graph, params, onClickNode }) {
     const graphData = useMemo(() => toReactForceGraph(graph), [graph])
 
-    const adjList = useMemo(() => getAdjList(graphData), [graphData])
+    const adjList = useMemo(() => getAdjList(graphData.links), [graphData])
 
     const nodeProps = useMemo(() => {
         let nodes = calculateNodeMetrics(graphData.nodes, params.metrics)
@@ -195,7 +195,7 @@ function Graph({ size, graph, params, onClickNode }) {
                 }
 
                 if (nodeProps[highNode].component === node.component && !isNodeHigh(node)) {
-                    return hexOpacity(color, 0.3)
+                    return hexOpacity(color, 0.1)
                 }
 
                 return color
@@ -302,7 +302,7 @@ function Graph({ size, graph, params, onClickNode }) {
         }
 
         function _2(txt) {
-            return ellipsis(txt, 20)
+            return ellipsis(txt, 15)
         }
 
         let ret = node
@@ -314,6 +314,8 @@ function Graph({ size, graph, params, onClickNode }) {
         ret = ret ?? '???'
         return ret
     }
+
+    console.log(highNodes)
 
     const nodeCanvasObject = useCallback(
         (node, ctx, globalScale) => {
@@ -327,11 +329,9 @@ function Graph({ size, graph, params, onClickNode }) {
                 fontSize += 3
             }
 
-            const isHigh = (highNode && highNode === node.id) || highNodesFns.has(node.id)
-
             // font size
             const label = getLabel(node, {
-                shorten: !isHigh
+                shorten: !(highNode && highNode === node.id)
             })
 
             fontSize /= globalScale

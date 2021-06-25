@@ -120,6 +120,10 @@ class App:
 
         return dict(zip(ix, size))
 
+    def add_degree_attrs(self):
+        for node, degree in self.g.degree:
+            self.g.nodes[node]['degree'] = degree
+
     def add_metric_attrs(self, normalize_by_connected_component=True):
         switcher = {
             'degree_centrality': nx.degree_centrality,
