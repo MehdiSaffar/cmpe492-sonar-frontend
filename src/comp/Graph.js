@@ -119,7 +119,7 @@ const getAdjList = ({ links }) => {
     return obj
 }
 
-function Graph({ size, graph, params }) {
+function Graph({ size, graph, params, onClickNode }) {
     const graphData = useMemo(() => toReactForceGraph(graph), [graph])
 
     const adjList = useMemo(() => getAdjList(graphData), [graphData])
@@ -214,17 +214,17 @@ function Graph({ size, graph, params }) {
             // if (isLinkHigh(link)) return 'rgba(0,0,0,1)'
             // return 'rgba(0,0,0,0.1)'
             const getLinkColor = link => {
-                if (params.colorEdgeBy === 'type') {
-                    return getUniqueColor(link.type)
-                }
+                // if (params.colorEdgeBy === 'type') {
+                //     return getUniqueColor(link.type)
+                // }
 
-                if (params.colorEdgeBy === 'component') {
-                    if (typeof link.source === 'string') {
-                        return getUniqueColor(nodeProps[link.source].component)
-                    }
+                // if (params.colorEdgeBy === 'component') {
+                //     // if (typeof link.source === 'string') {
+                //     return getUniqueColor(nodeProps[getLinkSourceIdSafely(link)].component)
+                //     // }
 
-                    return getUniqueColor(link.source.component)
-                }
+                //     // return getUniqueColor(link.source.component)
+                // }
 
                 return '#b0b0b0'
             }
@@ -340,6 +340,7 @@ function Graph({ size, graph, params }) {
             nodeVal={10}
             nodeColor={nodeColor}
             linkColor={linkColor}
+            onNodeClick={onClickNode}
             // linkDirectionalParticles={linkDirectionalParticles}
             // linkDirectionalParticleSpeed={linkDirectionalParticleSpeed}
             nodeCanvasObject={nodeCanvasObject}

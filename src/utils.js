@@ -1,6 +1,6 @@
 import { notification } from 'antd'
 import ColorHash from 'color-hash'
-import { formatDistanceToNow, isValid } from 'date-fns'
+import { format, formatDistanceToNow, isValid } from 'date-fns'
 import doiRegex from 'doi-regex'
 import objectHash from 'object-hash'
 
@@ -170,6 +170,14 @@ export function formatArticleListGraphResponse(r) {
         const type = n.node_type
         n.type = type
         delete n.node_type
+
+        if (n.type === 'article') {
+            const cited_by_count = n.info['cited-by_count']
+            n.info.cited_by_count = cited_by_count
+            delete n.info['cited-by_count']
+
+            n.created_date = newDateOrKeep(n.created_date)
+        }
     })
 
     r.edges.forEach(e => {
@@ -179,9 +187,9 @@ export function formatArticleListGraphResponse(r) {
         e.info = info
         delete e.specific_information
 
-        const type = e.node_type
+        const type = e.edge_type
         e.type = type
-        delete e.node_type
+        delete e.edge_type
     })
 
     return r
@@ -208,6 +216,10 @@ export function renderDateToNow(d) {
 
 export function returnOr(x, s = 'Missing') {
     return x ?? s
+}
+
+export function formatDate(date) {
+    return format(date, 'dd/MM/yyyy')
 }
 
 const colorHash = new ColorHash()

@@ -11,7 +11,7 @@ export function useApi(
     url,
     {
         showErrorNotification = true,
-        showSuccessNotification = true,
+        showSuccessNotification = false,
         // processData = identity,
         processData = data => data.result,
         successNotification = 'Fetched data successfully',
