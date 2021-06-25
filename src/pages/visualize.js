@@ -110,7 +110,12 @@ function NodeDetails({ node }) {
     }
 
     if (node.type === 'topic') {
-        return null
+        return (
+            <div>
+                <h1>Topic details</h1>
+                <KVPair name={'Name'}>{node.key}</KVPair>
+            </div>
+        )
     }
 
     return null
