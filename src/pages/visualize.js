@@ -46,8 +46,8 @@ const colorEdgeByOptions = [
 ]
 
 const metricsOptions = [
-    { value: 'degree_centrality', label: 'degree' }
-    // { value: 'eigenvector_centrality', label: 'eigenvector' },
+    { value: 'degree_centrality', label: 'degree' },
+    { value: 'eigenvector_centrality', label: 'eigenvector' }
     // { value: 'closeness_centrality', label: 'closeness' },
     // { value: 'betweenness_centrality', label: 'betweenness' }
     // { value: 'communicability_centrality', label: 'communicability' },
@@ -109,7 +109,7 @@ function NodeDetails({ node }) {
                 <KVPair name={'DOI'}>{node.info.doi}</KVPair>
                 <KVPair name={'Title'}>{node.info.title}</KVPair>
                 <KVPair name={'Cited by count'}>{node.info.cited_by_count}</KVPair>
-                <KVPair name={'Published date'}>{formatDate(node.created_date)}</KVPair>
+                {node.created_date && <KVPair name={'Published date'}>{formatDate(node.created_date)}</KVPair>}
                 <NodeInfos node={node} />
             </div>
         )
@@ -154,12 +154,7 @@ export default function Visualize(props) {
         connectedComponentCount: 1,
         colorNodeBy: 'type',
         colorEdgeBy: 'component',
-        metrics: {
-            degree_centrality: 1,
-            eigenvector_centrality: 1,
-            closeness_centrality: 1,
-            betweenness_centrality: 1
-        }
+        metrics: Object.fromEntries(Object.entries(metricsOptions).map(m => [m.value, 1]))
     }
 
     const [params, setParams] = useState(initialValues)

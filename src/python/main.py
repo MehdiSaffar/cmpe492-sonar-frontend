@@ -127,7 +127,7 @@ class App:
     def add_metric_attrs(self, normalize_by_connected_component=True):
         switcher = {
             'degree_centrality': nx.degree_centrality,
-            # 'eigenvector_centrality': nx.eigenvector_centrality,
+            'eigenvector_centrality': nx.eigenvector_centrality,
             # 'closeness_centrality': nx.closeness_centrality,
             # 'betweenness_centrality': nx.betweenness_centrality,
             # 'communicability_centrality': nx.communicability_centrality,
@@ -149,8 +149,8 @@ class App:
                 node = self.g.nodes[metric_node]
 
                 node[metric_key] = metric_value
-                if normalize_by_connected_component:
-                    node[metric_key] /= cn_info[node['component']]
+                # if normalize_by_connected_component:
+                #     node[metric_key] /= cn_info[node['component']]
 
     def remove_nodes_of_type(self, node_type):
         self.g.remove_nodes_from(get_nodes_of_type(self.g, node_type))

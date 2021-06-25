@@ -65,6 +65,7 @@ const calculateMetricWeightSum = metrics => {
 // }
 
 const calculateNodeMetrics = (nodes, metrics) => {
+    console.log('metrics', metrics)
     const metricWeightSum = calculateMetricWeightSum(metrics)
 
     nodes.map(node => {
