@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ForceGraph2D, ForceGraph3D } from 'react-force-graph'
 import { withSize } from 'react-sizeme'
 import rgbaToHex from 'rgb-hex'
+import ellipsis from 'text-ellipsis'
 
 import { useSet } from '../hooks'
 import { getRange, getUniqueColor } from '../utils'
@@ -285,9 +286,38 @@ function Graph({ size, graph, params, onClickNode }) {
 
     const linkWidth = useCallback(link => (isLinkHigh(link) ? 2 : 1), [isLinkHigh])
 
+    const getLabel = (node, { shorten = true }) => {
+        function _1(node) {
+            if (node.type === 'article') {
+                return node.info.title
+            }
+
+            if (node.type === 'author') {
+                return node.info.full_name
+            }
+
+            if (node.type === 'topic') {
+                return node.key
+            }
+        }
+
+        function _2(txt) {
+            return ellipsis(txt, 20)
+        }
+
+        let ret = node
+        ret = _1(ret)
+        if (shorten) {
+            ret = _2(ret)
+        }
+
+        ret = ret ?? '???'
+        return ret
+    }
+
     const nodeCanvasObject = useCallback(
         (node, ctx, globalScale) => {
-            const label = node.id
+            // font size
             let fontSize = 12
             if (highNode && highNode === node.id) {
                 fontSize += 6
@@ -296,6 +326,13 @@ function Graph({ size, graph, params, onClickNode }) {
             if (highNodesFns.has(node.id)) {
                 fontSize += 3
             }
+
+            const isHigh = (highNode && highNode === node.id) || highNodesFns.has(node.id)
+
+            // font size
+            const label = getLabel(node, {
+                shorten: !isHigh
+            })
 
             fontSize /= globalScale
             ctx.font = `${fontSize}px Sans-Serif`

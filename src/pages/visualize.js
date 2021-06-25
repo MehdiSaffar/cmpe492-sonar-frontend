@@ -150,7 +150,7 @@ export default function Visualize(props) {
 
     const [graph, graphLoading] = useAsyncMemo(async () => {
         const { nodes, edges, removeIsolates } = query
-        // if (!data) return
+        if (!data) return
 
         if (!isPyReady) return
 
