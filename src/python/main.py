@@ -2,6 +2,7 @@ import networkx as nx
 import numpy as np
 import networkx.readwrite
 import itertools as it
+from collections import defaultdict
 import io
 import pyodide
 import json
@@ -128,13 +129,13 @@ class App:
         switcher = {
             'degree_centrality': nx.degree_centrality,
             'eigenvector_centrality': nx.eigenvector_centrality,
-            # 'closeness_centrality': nx.closeness_centrality,
-            # 'betweenness_centrality': nx.betweenness_centrality,
-            # 'communicability_centrality': nx.communicability_centrality,
-            # 'load_centrality': nx.load_centrality,
+            'closeness_centrality': nx.closeness_centrality,
+            # 'betweenness_centrality': nx.betweenness_centrality, PROBLEM
+            # 'communicability_centrality': nx.communicability_centrality, MISSING
+            'load_centrality': nx.load_centrality,
             # 'subgraph_centrality': nx.subgraph_centrality,
-            # 'harmonic_centrality': nx.harmonic_centrality,
-            # 'voterank': nx.voterank,
+            'harmonic_centrality': nx.harmonic_centrality,
+            # 'voterank': nx.voterank, PROBLEM
         }
 
         values = {}
@@ -149,8 +150,8 @@ class App:
                 node = self.g.nodes[metric_node]
 
                 node[metric_key] = metric_value
-                # if normalize_by_connected_component:
-                #     node[metric_key] /= cn_info[node['component']]
+                if normalize_by_connected_component:
+                    node[metric_key] /= cn_info[node['component']]
 
     def remove_nodes_of_type(self, node_type):
         self.g.remove_nodes_from(get_nodes_of_type(self.g, node_type))
@@ -160,8 +161,6 @@ class App:
 
     def add_edges_of_type(self, edge_type):
         switcher = {
-            # 'author_of': lamdba
-            # 'topic_of': lamdba
             'coauthor': self.add_author_coauthor_author_edges,
             'author_cotopic': self.add_author_cotopic_author_edges,
             'article_cotopic': self.add_article_cotopic_article_edges,
@@ -174,36 +173,63 @@ class App:
 
         fn()
 
+    # def add_author_coauthor_author_edges(self):
+    #     edges = set()
+    #     for node, node_data in self.g.nodes(data=True):
+    #         if node_data['type'] == 'article':
+    #             authors = get_neighbor_nodes_of_type_along_edge_of_type(self.g, node, 'author_of', 'author')
+    #             edges.update(it.combinations(authors, 2))
+
+    #     for edge in edges:
+    #         self.g.add_edge(*edge, type='coauthor')
+
+    # def add_author_cotopic_author_edges(self):
+    #     edges = set()
+    #     for node, node_data in self.g.nodes(data=True):
+    #         if node_data['type'] == 'topic':
+    #             articles = get_neighbor_nodes_of_type_along_edge_of_type(self.g, node, 'topic_of', 'article')
+    #             authors = set(chain(get_neighbor_nodes_of_type_along_edge_of_type(self.g, article, 'author_of', 'author') for article in articles))
+    #             edges.update(it.combinations(authors, 2))
+
+    #     for edge in edges:
+    #         self.g.add_edge(*edge, type='author_cotopic')
+
     def add_author_coauthor_author_edges(self):
-        edges = set()
+        edges = defaultdict(int)
         for node, node_data in self.g.nodes(data=True):
             if node_data['type'] == 'article':
                 authors = get_neighbor_nodes_of_type_along_edge_of_type(self.g, node, 'author_of', 'author')
-                edges.update(it.combinations(authors, 2))
+                author_combos = list(it.combinations(authors, 2))
+                for src, trg in author_combos:
+                    edges[(min(src, trg), max(src, trg))] += 1
 
-        for edge in edges:
-            self.g.add_edge(*edge, type='coauthor')
+        for edge, count in edges.items():
+            self.g.add_edge(*edge, type='coauthor', count=count)
 
     def add_author_cotopic_author_edges(self):
-        edges = set()
+        edges = defaultdict(int)
         for node, node_data in self.g.nodes(data=True):
             if node_data['type'] == 'topic':
                 articles = get_neighbor_nodes_of_type_along_edge_of_type(self.g, node, 'topic_of', 'article')
                 authors = set(chain(get_neighbor_nodes_of_type_along_edge_of_type(self.g, article, 'author_of', 'author') for article in articles))
-                edges.update(it.combinations(authors, 2))
+                author_combos = list(it.combinations(authors, 2))
+                for src, trg in author_combos:
+                    edges[(min(src, trg), max(src, trg))] += 1
 
-        for edge in edges:
-            self.g.add_edge(*edge, type='author_cotopic')
+        for edge, count in edges.items():
+            self.g.add_edge(*edge, type='author_cotopic', count=count)
 
     def add_article_cotopic_article_edges(self):
-        edges = set()
+        edges = defaultdict(int)
         for node, node_data in self.g.nodes(data=True):
             if node_data['type'] == 'topic':
                 articles = get_neighbor_nodes_of_type_along_edge_of_type(self.g, node, 'topic_of', 'article')
-                edges.update(it.combinations(articles, 2))
+                combos = list(it.combinations(articles, 2))
+                for src, trg in combos:
+                    edges[(min(src, trg), max(src, trg))] += 1
 
-        for edge in edges:
-            self.g.add_edge(*edge, type='article_cotopic')
+        for edge, count in edges.items():
+            self.g.add_edge(*edge, type='article_cotopic', count=count)
 
     def count_isolates(self):
         return len(list(nx.isolates(self.g)))
@@ -245,23 +271,6 @@ class App:
         for comp_ix, comp in enumerate(comps):
             for node in comp:
                 self.g.nodes[node]['component'] = comp_ix
-
-    # def add_layout_attr(self):
-    #     nodes = nx.spring_layout(self.g, dim=3)
-
-    #     for node, (x, y, z) in nodes.items():
-    #         self.g.nodes[node]['x'] = x
-    #         self.g.nodes[node]['y'] = y
-    #         self.g.nodes[node]['z'] = z
-
-    # def layout(self):
-    #     return nx.drawing.layout.spring_layout(self.g)
-
-    # def get_memory_usage(self):
-    #     return sys.getsizeof(self.G.edges(data=True)) + sys.getsizeof(self.G.nodes(data=True))
-
-    # def get_adj(self):
-    #     return nx.readwrite.json_graph.adjacency_data(self.G)
 
 
 app = App()

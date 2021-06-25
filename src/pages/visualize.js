@@ -47,14 +47,14 @@ const colorEdgeByOptions = [
 
 const metricsOptions = [
     { value: 'degree_centrality', label: 'degree' },
-    { value: 'eigenvector_centrality', label: 'eigenvector' }
-    // { value: 'closeness_centrality', label: 'closeness' },
-    // { value: 'betweenness_centrality', label: 'betweenness' }
-    // { value: 'communicability_centrality', label: 'communicability' },
-    // { value: 'load_centrality', label: 'load' },
-    // { value: 'subgraph_centrality', label: 'subgraph' },
-    // { value: 'harmonic_centrality', label: 'harmonic' },
-    // { value: 'voterank', label: 'voterank' }
+    { value: 'eigenvector_centrality', label: 'eigenvector' },
+    { value: 'closeness_centrality', label: 'closeness' },
+    // { value: 'betweenness_centrality', label: 'betweenness' } PROBLEM
+    // { value: 'communicability_centrality', label: 'communicability' }, MISSING
+    { value: 'load_centrality', label: 'load' },
+    // { value: 'subgraph_centrality', label: 'subgraph' }, BAD
+    { value: 'harmonic_centrality', label: 'harmonic' }
+    // { value: 'voterank', label: 'voterank' } PROBLEM
 ]
 
 const formItemLayout = {
@@ -152,10 +152,12 @@ export default function Visualize(props) {
     const [form] = Form.useForm()
     const initialValues = {
         connectedComponentCount: 1,
-        colorNodeBy: 'type',
+        colorNodeBy: 'metric',
         colorEdgeBy: 'component',
-        metrics: Object.fromEntries(Object.entries(metricsOptions).map(m => [m.value, 1]))
+        metrics: Object.fromEntries(metricsOptions.map(m => [m.value, 1]))
     }
+
+    console.log(initialValues)
 
     const [params, setParams] = useState(initialValues)
     // const dataLoading = false

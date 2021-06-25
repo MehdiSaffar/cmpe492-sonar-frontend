@@ -1,5 +1,6 @@
-import { interpolateRdYlBu } from 'd3-scale-chromatic'
 import { interpolateYlGn } from 'd3-scale-chromatic'
+// import { interpolateTurbo as interpolateYlGn } from 'd3-scale-chromatic'
+// import { interpolatePlasma as interpolateYlGn } from 'd3-scale-chromatic'
 import hexOpacity from 'hex-color-opacity'
 import hexToRgba from 'hex-to-rgba'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -170,6 +171,8 @@ function Graph({ size, graph, params, onClickNode }) {
 
     const isNodeHigh = useCallback(node => highNode === node.id || highNodesFns.has(node.id), [highNode, highNodes])
 
+    console.log(metricMin, metricMax)
+
     const nodeColor = useCallback(
         node => {
             const getNodeColor = node => {
@@ -216,17 +219,13 @@ function Graph({ size, graph, params, onClickNode }) {
             // if (isLinkHigh(link)) return 'rgba(0,0,0,1)'
             // return 'rgba(0,0,0,0.1)'
             const getLinkColor = link => {
-                // if (params.colorEdgeBy === 'type') {
-                //     return getUniqueColor(link.type)
-                // }
+                if (params.colorEdgeBy === 'type') {
+                    return getUniqueColor(link.type)
+                }
 
-                // if (params.colorEdgeBy === 'component') {
-                //     // if (typeof link.source === 'string') {
-                //     return getUniqueColor(nodeProps[getLinkSourceIdSafely(link)].component)
-                //     // }
-
-                //     // return getUniqueColor(link.source.component)
-                // }
+                if (params.colorEdgeBy === 'component') {
+                    return getUniqueColor(nodeProps[getLinkSourceIdSafely(link)].component)
+                }
 
                 return '#b0b0b0'
             }
@@ -316,12 +315,12 @@ function Graph({ size, graph, params, onClickNode }) {
         return ret
     }
 
-    console.log(highNodes)
+    console.log(graphData.links)
 
     const nodeCanvasObject = useCallback(
         (node, ctx, globalScale) => {
             // font size
-            let fontSize = 12
+            let fontSize = 14
             if (highNode && highNode === node.id) {
                 fontSize += 6
             }
@@ -347,7 +346,7 @@ function Graph({ size, graph, params, onClickNode }) {
                 node.x - bckgDimensions[0] / 2,
                 node.y + bckgDimensions[1] / 2,
                 bckgDimensions[0],
-                2 / globalScale
+                8 / globalScale
             )
 
             ctx.fillStyle = 'rgba(255, 255, 255, 0.8)'
@@ -355,8 +354,8 @@ function Graph({ size, graph, params, onClickNode }) {
 
             ctx.textAlign = 'center'
             ctx.textBaseline = 'middle'
-            ctx.fillStyle = color
-            // ctx.fillStyle = 'black'
+            // ctx.fillStyle = color
+            ctx.fillStyle = 'black'
             ctx.fillText(label, node.x, node.y)
 
             node.__bckgDimensions = bckgDimensions // to re-use in nodePointerAreaPaint
