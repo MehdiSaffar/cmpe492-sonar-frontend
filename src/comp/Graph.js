@@ -137,6 +137,11 @@ function Graph({ size, graph, params, onClickNode }) {
         return getRange(values)
     }, [nodeProps])
 
+    const [linkCountMin, linkCountMax] = useMemo(() => {
+        let values = graphData.links.map(link => link.count ?? 1)
+        return getRange(values)
+    }, [graphData.links])
+
     const [highNode, setHighNode] = useState()
     // const [highLink, setHighLink] = useState()
 
@@ -284,7 +289,18 @@ function Graph({ size, graph, params, onClickNode }) {
     //     [highNode, highNodes]
     // )
 
-    const linkWidth = useCallback(link => (isLinkHigh(link) ? 2 : 1), [isLinkHigh])
+    const linkWidth = useCallback(
+        link => {
+            const width = ((link.count ?? 1) - linkCountMin) / (linkCountMax - linkCountMin)
+
+            let ret = width
+            ret *= 8
+            ret += 1
+            ret *= isLinkHigh(link) ? 2 : 1
+            return ret
+        },
+        [graphData, isLinkHigh, linkCountMin, linkCountMax]
+    )
 
     const getLabel = (node, { shorten = true }) => {
         function _1(node) {
