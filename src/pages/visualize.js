@@ -81,9 +81,11 @@ function KVPair({ name, children }) {
 function NodeInfos({ node }) {
     return (
         <>
-            <h1>Info</h1>
+            <h2>Info</h2>
             <KVPair name={'Degree'}>{node.degree}</KVPair>
             <KVPair name={'Component index'}>{node.component}</KVPair>
+
+            <h3>Metrics</h3>
             {metricsOptions.map(({ value, label }) => {
                 return (
                     <KVPair key={value} name={label}>
@@ -104,7 +106,7 @@ function NodeDetails({ node }) {
 
     if (node.type === 'article') {
         return (
-            <div>
+            <div className="node-details">
                 <h1>Article details</h1>
                 <KVPair name={'DOI'}>{node.info.doi}</KVPair>
                 <KVPair name={'Title'}>{node.info.title}</KVPair>
@@ -117,7 +119,7 @@ function NodeDetails({ node }) {
 
     if (node.type === 'author') {
         return (
-            <div>
+            <div className="node-details">
                 <h1>Author details</h1>
                 <KVPair name={'API ID'}>{node.info.id}</KVPair>
                 <KVPair name={'Full name'}>{node.info.full_name}</KVPair>
@@ -131,7 +133,7 @@ function NodeDetails({ node }) {
 
     if (node.type === 'topic') {
         return (
-            <div>
+            <div className="node-details">
                 <h1>Topic details</h1>
                 <KVPair name={'Name'}>{node.key}</KVPair>
                 <NodeInfos node={node} />
