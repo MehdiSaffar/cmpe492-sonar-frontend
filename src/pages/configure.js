@@ -14,16 +14,9 @@ export default function Configure(props, b, c) {
     const router = useRouter()
     const id = router.match.params.id
 
-    // if (!isPyReady) {
-    //     return <div>Please wait until Python is ready</div>
-    // }
-
     const [nodes, setNodes] = useState([])
     const [edges, setEdges] = useState([])
     const [removeIsolates, setRemoveIsolates] = useState(false)
-
-    const [state, setState] = useState('config')
-    const [msg, setMsg] = useState('')
 
     const onNodeChange = nodes => {
         const newEdges = edges.filter(edge => edgeSatisfiesConstraints(edge, nodes))
@@ -41,17 +34,8 @@ export default function Configure(props, b, c) {
         })
     }
 
-    const nodeCheckbox = (
-        <Checkbox.Group value={nodes} disabled={state != 'config'} options={nodeOptions} onChange={onNodeChange} />
-    )
-    const edgeCheckbox = (
-        <Checkbox.Group
-            value={edges}
-            disabled={state != 'config'}
-            options={processEdges(edgeOptions)}
-            onChange={onEdgeChange}
-        />
-    )
+    const nodeCheckbox = <Checkbox.Group value={nodes} options={nodeOptions} onChange={onNodeChange} />
+    const edgeCheckbox = <Checkbox.Group value={edges} options={processEdges(edgeOptions)} onChange={onEdgeChange} />
     const removeIsolatesCheckbox = (
         <Checkbox checked={removeIsolates} onChange={e => setRemoveIsolates(e.target.checked)}>
             Remove isolates
@@ -84,31 +68,34 @@ export default function Configure(props, b, c) {
                 subTitle="Here you can find the articles of this list"
                 onBack={() => router.history.push(`/dataset/${id}`)}
                 extra={[
-                    <Button key="1" type="primary" disabled={!(isPyReady && canSubmit)} onClick={onConfirm}>
+                    <Button key="1" type="primary" disabled={!canSubmit} onClick={onConfirm}>
                         Visualize
                     </Button>
                 ]}
             />
-            {state}
-            <br />
-            Please select the nodes and edges you would like to visualize <br />
-            <br />
-            Nodes:
-            <br />
-            {nodeCheckbox}
-            <br />
-            <br />
-            Edges:
-            <br />
-            {edgeCheckbox}
-            <br />
-            <br />
-            {removeIsolatesCheckbox}
-            <br />
-            <br />
-            <Button disabled={!(isPyReady && canSubmit)} type="primary" onClick={onConfirm}>
-                Confirm
-            </Button>
+            <div className="configure-content">
+                <br />
+                Please select the nodes and edges you would like to visualize <br />
+                <br />
+                <b>Nodes:</b>
+                <br />
+                {nodeCheckbox}
+                <br />
+                <br />
+                <b>Edges:</b>
+                <br />
+                {edgeCheckbox}
+                <br />
+                <br />
+                Extra:
+                <br />
+                {removeIsolatesCheckbox}
+                <br />
+                <br />
+                <Button disabled={!canSubmit} type="primary" onClick={onConfirm}>
+                    Confirm
+                </Button>
+            </div>
         </div>
     )
 }
