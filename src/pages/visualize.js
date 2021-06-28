@@ -2,7 +2,7 @@ import './visualize.less'
 
 import { Button, Form, InputNumber, Select, Slider } from 'antd'
 import qs from 'query-string'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 
 import Graph from '../comp/Graph'
 import LoadingPage from '../comp/LoadingPage'
@@ -271,6 +271,12 @@ export default function Visualize(props) {
         []
     )
 
+    const graphRef = useRef()
+    const onZoomToFit = useCallback(() => {
+        // console.log(graphRef);
+        graphRef.current.zoomToFit(400)
+    }, [graphRef])
+
     if (!canRender) {
         return <LoadingPage tip={tip} />
     }
@@ -278,13 +284,20 @@ export default function Visualize(props) {
     return (
         <div className="visualize">
             <div className="graph">
-                <Graph graph={graph} params={params} onClickNode={onClickNode} componentFocused={componentFocused} />
+                <Graph
+                    ref={graphRef}
+                    graph={graph}
+                    params={params}
+                    onClickNode={onClickNode}
+                    componentFocused={componentFocused}
+                />
             </div>
             <div className="side">
                 {currentNode !== undefined && currentNode.component !== componentFocused && (
                     <Button onClick={onFocusComponent(currentNode.component)}>Focus on connected component</Button>
                 )}
                 {componentFocused !== undefined && <Button onClick={onFocusComponent()}>Focus on entire graph</Button>}
+                <Button onClick={onZoomToFit}>Zoom to Fit</Button>
                 <NodeDetails node={currentNode} />
                 <div>
                     <h1>Graph visualization</h1>

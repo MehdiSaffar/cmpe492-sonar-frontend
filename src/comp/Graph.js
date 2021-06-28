@@ -3,9 +3,9 @@ import { interpolateYlGn } from 'd3-scale-chromatic'
 // import { interpolatePlasma as interpolateYlGn } from 'd3-scale-chromatic'
 import hexOpacity from 'hex-color-opacity'
 import hexToRgba from 'hex-to-rgba'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import { ForceGraph2D, ForceGraph3D } from 'react-force-graph'
-import { withSize } from 'react-sizeme'
+import { SizeMe, withSize } from 'react-sizeme'
 import rgbaToHex from 'rgb-hex'
 import ellipsis from 'text-ellipsis'
 
@@ -147,7 +147,7 @@ function filterNodeOfComponent(graph, componentFocused) {
     return graph
 }
 
-function Graph({ size, graph, params, onClickNode, componentFocused }) {
+const Graph = forwardRef(({ size, graph, params, onClickNode, componentFocused }, ref) => {
     const graphData = useMemo(() => {
         console.log('componentFocused', componentFocused)
         let ret = toReactForceGraph(graph)
@@ -414,6 +414,10 @@ function Graph({ size, graph, params, onClickNode, componentFocused }) {
 
     const fgRef = useRef()
 
+    useImperativeHandle(ref, () => ({
+        zoomToFit: fgRef.current.zoomToFit
+    }))
+
     const onEngineStop = useCallback(() => {
         fgRef.current.zoomToFit(400)
     }, [fgRef])
@@ -446,6 +450,8 @@ function Graph({ size, graph, params, onClickNode, componentFocused }) {
             // onEngineStop={onEngineStop}
         />
     )
-}
+})
 
-export default withSize({ monitorHeight: true, monitorWidth: true, noPlaceholder: false })(Graph)
+export default Graph
+
+// export default withSize({ monitorHeight: true, monitorWidth: true, noPlaceholder: false })(Graph)
