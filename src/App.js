@@ -1,6 +1,5 @@
 import './styles/App.less'
 
-import { LoadingOutlined } from '@ant-design/icons'
 import { useAuth0 } from '@auth0/auth0-react'
 import { Spin } from 'antd'
 import React, { useEffect, useState } from 'react'
@@ -10,6 +9,7 @@ import Worker from 'workerize-loader!./workers/pyodide.worker.js'
 import main_py from '!!raw-loader!./python/main.py'
 
 import api from './api'
+import LoadingPage from './comp/LoadingPage'
 import { useAppContext } from './context/AppContext'
 import { MainLayout } from './layout/MainLayout'
 import Configure from './pages/configure'
@@ -22,11 +22,6 @@ import Visualize from './pages/visualize'
 //     // eslint-disable-next-line unicorn/prefer-module
 //     require('../mocks')
 // }
-
-const loadingSpinner = <LoadingOutlined style={{ fontSize: 42 }} spin />
-const LoadingScreen = () => {
-    return <div className="app-loading">loading</div>
-}
 
 export default function App(props) {
     const auth = useAuth0()
@@ -74,12 +69,12 @@ export default function App(props) {
         _initPython()
     }, [])
 
+    // return <LoadingPage />
+
     return (
         <>
             {loading || isLoading ? (
-                <Spin className="app-loading-spin" indicator={loadingSpinner} delay={3000} spinning={true}>
-                    <LoadingScreen />
-                </Spin>
+                <LoadingPage delay={3000} />
             ) : (
                 <MainLayout>
                     <Switch>
