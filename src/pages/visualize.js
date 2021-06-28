@@ -156,7 +156,7 @@ export default function Visualize(props) {
         connectedComponentCount: 1,
         colorNodeBy: 'metric',
         colorEdgeBy: 'type',
-        metrics: Object.fromEntries(metricsOptions.map(m => [m.value, 1]))
+        metrics: Object.fromEntries(metricsOptions.map(m => [m.value, m.value == 'degree_centrality' ? 1 : 0]))
     }
 
     console.log(initialValues)
