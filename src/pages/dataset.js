@@ -5,7 +5,7 @@ import { useMemo } from 'react'
 
 import StatusTag from '../comp/StatusTag'
 import { useApi, useRouter } from '../hooks'
-import { formatArticleListResponse, renderDateToNow, returnOr } from '../utils'
+import { formatArticleListResponse, getDoiUrl, renderDateToNow, returnOr } from '../utils'
 
 const columns = [
     {
@@ -26,7 +26,13 @@ const columns = [
         title: 'DOI',
         dataIndex: 'doi',
         key: 'doi',
-        render: returnOr
+        render: doi => {
+            return (
+                <a href={getDoiUrl(doi)} target="_blank" rel="noreferrer">
+                    {doi}
+                </a>
+            )
+        }
     },
     {
         title: 'Title',

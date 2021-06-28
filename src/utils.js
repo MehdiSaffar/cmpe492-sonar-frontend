@@ -235,3 +235,7 @@ export const getUniqueColor = o => {
 
     return colorHash.hex(objectHash(o))
 }
+
+export function getDoiUrl(doi) {
+    return `https://doi.org/${doi}`
+}
