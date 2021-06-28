@@ -397,7 +397,7 @@ function Graph({ size, graph, params, onClickNode }) {
             onNodeHover={onNodeHover}
             onLinkHover={onLinkHover}
             nodeResolution={1}
-            cooldownTicks={50}
+            cooldownTicks={400}
         />
     )
 }

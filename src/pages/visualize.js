@@ -155,7 +155,7 @@ export default function Visualize(props) {
     const initialValues = {
         connectedComponentCount: 1,
         colorNodeBy: 'metric',
-        colorEdgeBy: 'component',
+        colorEdgeBy: 'type',
         metrics: Object.fromEntries(metricsOptions.map(m => [m.value, 1]))
     }
 
