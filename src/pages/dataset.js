@@ -100,7 +100,9 @@ export default function Dataset(props) {
                     <div>
                         Here you can find the articles of this list
                         <br />
-                        Fetching: {fetchCount}, Processing: {processingCount}, Done: {doneCount}
+                        {fetchCount} <StatusTag type={'article'} status={'to_be_fetched'} /> 
+                        {processingCount} <StatusTag type={'article'} status={'to_be_processed'} /> 
+                        {doneCount} <StatusTag type={'article'} status={'done'} /> 
                     </div>
                 }
                 onBack={() => router.history.push('/dashboard')}
