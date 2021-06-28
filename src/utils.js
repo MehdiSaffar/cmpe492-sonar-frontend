@@ -211,7 +211,7 @@ export function renderDateToNow(d) {
         return 'Missing/Invalid date'
     }
 
-    return formatDistanceToNow(d)
+    return formatDistanceToNow(d, { addSuffix: ' ago' })
 }
 
 export function returnOr(x, s = 'Missing') {
