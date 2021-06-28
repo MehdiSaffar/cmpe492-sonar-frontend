@@ -279,7 +279,7 @@ export default function Visualize(props) {
                 <div>
                     <h1>Graph visualization</h1>
                     <Form form={form} {...formItemLayout} preserve onFinish={setParams} initialValues={initialValues}>
-                        Connected components
+                        {/* Connected components
                         <Form.Item name={'connectedComponentCount'} label="Top Conn. Comps">
                             <Slider
                                 min={1}
@@ -288,7 +288,7 @@ export default function Visualize(props) {
                                 // value={Math.min(_connectedComponentCount, graph.connectedComponentCount)}
                                 // onChange={setConnectedComponentCount}
                             />
-                        </Form.Item>
+                        </Form.Item> */}
                         Coloring
                         <Form.Item name={'colorNodeBy'} label="Color node by">
                             <Select options={colorNodeByOptions} />
