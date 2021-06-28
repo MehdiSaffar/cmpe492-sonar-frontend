@@ -256,6 +256,7 @@ export default function Visualize(props) {
     }, [data, isPyReady])
 
     const [currentNode, setCurrentNode] = useState()
+    const [componentFocused, setComponentFocused] = useState()
 
     const onClickNode = useCallback(node => {
         setCurrentNode(node)
@@ -263,18 +264,27 @@ export default function Visualize(props) {
 
     const canRender = isPyReady && !dataLoading && graph && !graphLoading
 
+    const onFocusComponent = useCallback(
+        comp => () => {
+            setComponentFocused(comp)
+        },
+        []
+    )
+
     if (!canRender) {
         return <LoadingPage tip={tip} />
     }
 
-    console.log(params)
-
     return (
         <div className="visualize">
             <div className="graph">
-                <Graph graph={graph} params={params} onClickNode={onClickNode} />
+                <Graph graph={graph} params={params} onClickNode={onClickNode} componentFocused={componentFocused} />
             </div>
             <div className="side">
+                {currentNode !== undefined && currentNode.component !== componentFocused && (
+                    <Button onClick={onFocusComponent(currentNode.component)}>Focus on connected component</Button>
+                )}
+                {componentFocused !== undefined && <Button onClick={onFocusComponent()}>Focus on entire graph</Button>}
                 <NodeDetails node={currentNode} />
                 <div>
                     <h1>Graph visualization</h1>

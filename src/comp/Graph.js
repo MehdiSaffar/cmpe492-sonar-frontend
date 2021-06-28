@@ -3,14 +3,14 @@ import { interpolateYlGn } from 'd3-scale-chromatic'
 // import { interpolatePlasma as interpolateYlGn } from 'd3-scale-chromatic'
 import hexOpacity from 'hex-color-opacity'
 import hexToRgba from 'hex-to-rgba'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ForceGraph2D, ForceGraph3D } from 'react-force-graph'
 import { withSize } from 'react-sizeme'
 import rgbaToHex from 'rgb-hex'
 import ellipsis from 'text-ellipsis'
 
 import { useSet } from '../hooks'
-import { getRange, getUniqueColor } from '../utils'
+import { getRange, getUniqueColor, sleep } from '../utils'
 
 const nodeColorMap = {
     article: '#0000FF',
@@ -136,8 +136,26 @@ const getAdjList = links => {
     return obj
 }
 
-function Graph({ size, graph, params, onClickNode }) {
-    const graphData = useMemo(() => toReactForceGraph(graph), [graph])
+function filterNodeOfComponent(graph, componentFocused) {
+    const nodes = new Set(graph.nodes.filter(node => node.component === componentFocused).map(node => node.id))
+
+    graph.nodes = graph.nodes.filter(node => nodes.has(node.id))
+    graph.links = graph.links.filter(link => {
+        return nodes.has(link.source) && nodes.has(link.target)
+    })
+
+    return graph
+}
+
+function Graph({ size, graph, params, onClickNode, componentFocused }) {
+    const graphData = useMemo(() => {
+        console.log('componentFocused', componentFocused)
+        let ret = toReactForceGraph(graph)
+        if (componentFocused !== undefined) {
+            ret = filterNodeOfComponent(ret, componentFocused)
+        }
+        return ret
+    }, [graph, componentFocused])
 
     const adjList = useMemo(() => getAdjList(graphData.links), [graphData])
 
@@ -379,8 +397,34 @@ function Graph({ size, graph, params, onClickNode }) {
         setHighLink(link)
     }, [])
 
+    const nodeVisibility = useCallback(
+        node => {
+            if (componentFocused === undefined) {
+                return true
+            }
+
+            return node.component === componentFocused
+        },
+        [componentFocused]
+    )
+
+    const onBackgroundClick = useCallback(() => {
+        onClickNode()
+    }, [])
+
+    const fgRef = useRef()
+
+    const onEngineStop = useCallback(() => {
+        fgRef.current.zoomToFit(400)
+    }, [fgRef])
+
+    useEffect(() => {
+        sleep(200).then(onEngineStop)
+    }, [componentFocused])
+
     return (
         <ForceGraph2D
+            ref={fgRef}
             {...size}
             graphData={graphData}
             nodeVal={10}
@@ -388,7 +432,8 @@ function Graph({ size, graph, params, onClickNode }) {
             linkColor={linkColor}
             linkLabel={linkLabel}
             onNodeClick={onClickNode}
-            onBackgroundClick={onClickNode}
+            onBackgroundClick={onBackgroundClick}
+            nodeVisibility={nodeVisibility}
             // linkDirectionalParticles={linkDirectionalParticles}
             // linkDirectionalParticleSpeed={linkDirectionalParticleSpeed}
             nodeCanvasObject={nodeCanvasObject}
@@ -398,6 +443,7 @@ function Graph({ size, graph, params, onClickNode }) {
             onLinkHover={onLinkHover}
             nodeResolution={1}
             cooldownTicks={400}
+            // onEngineStop={onEngineStop}
         />
     )
 }
