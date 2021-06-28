@@ -388,6 +388,7 @@ function Graph({ size, graph, params, onClickNode }) {
             linkColor={linkColor}
             linkLabel={linkLabel}
             onNodeClick={onClickNode}
+            onBackgroundClick={onClickNode}
             // linkDirectionalParticles={linkDirectionalParticles}
             // linkDirectionalParticleSpeed={linkDirectionalParticleSpeed}
             nodeCanvasObject={nodeCanvasObject}
