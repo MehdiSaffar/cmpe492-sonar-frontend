@@ -74,7 +74,7 @@ export default function App(props) {
     return (
         <>
             {loading || isLoading ? (
-                <LoadingPage delay={3000} />
+                <LoadingPage delay={3000} tip={'Loading SONAR...'} />
             ) : (
                 <MainLayout>
                     <Switch>

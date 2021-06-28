@@ -1,22 +1,20 @@
 import './visualize.less'
 
-import { Button, Checkbox, Form, InputNumber, Radio, Select, Slider, Switch } from 'antd'
+import { Button, Form, InputNumber, Select, Slider } from 'antd'
 import qs from 'query-string'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 
-import api from '../api'
-// import _data from '../assets/graph.small.json'
 import Graph from '../comp/Graph'
+import LoadingPage from '../comp/LoadingPage'
 import { useAppContext } from '../context/AppContext'
-import { useApi, useAsyncMemo, useDebouncedState, useRouter } from '../hooks'
+import { useApi, useAsyncMemo, useRouter } from '../hooks'
 import {
     edgeCreateIgnore,
     edgeCreationOrder,
     edgeOptions,
     formatArticleListGraphResponse,
     formatDate,
-    nodeOptions,
-    range
+    nodeOptions
 } from '../utils'
 
 const parseQuery = url => {
@@ -65,10 +63,6 @@ const formItemLayout = {
         span: 16
     }
 }
-
-// const data = (() => {
-//     return _data
-// })()
 
 function KVPair({ name, children }) {
     return (
@@ -162,7 +156,7 @@ export default function Visualize(props) {
     console.log(initialValues)
 
     const [params, setParams] = useState(initialValues)
-    // const dataLoading = false
+    const [tip, setTip] = useState('Loading graph...')
 
     const [data, dataLoading] = useApi('get', `/article-list/${id}/graph/`, {
         processData: formatArticleListGraphResponse
@@ -170,11 +164,17 @@ export default function Visualize(props) {
 
     const [graph, graphLoading] = useAsyncMemo(async () => {
         const { nodes, edges, removeIsolates } = query
-        if (!data) return
+        if (!isPyReady) {
+            setTip('Initializing Python...')
+            return
+        }
 
-        if (!isPyReady) return
+        if (!data) {
+            setTip('Downloading data...')
+            return
+        }
 
-        // setMsg('Loading graph into NetworkX')
+        setTip('Loading graph into NetworkX...')
         console.log('load', data)
         await py.load_graph(data)
 
@@ -193,13 +193,13 @@ export default function Visualize(props) {
         // NOTE: we don't really add nodes
         // for (const node of addNodes) {
         //     console.log('add node', node)
-        //     setMsg('Generationg nodes of type', node)
+        //     setTip('Generationg nodes of type', node)
         //     await py.add_nodes_of_type(node)
         // }
 
         for (const edge of addEdges) {
             console.log('add edge', edge)
-            // setMsg('Generating edges of type', edge)
+            setTip('Generating edges of type', edge, '...')
 
             if (edgeCreateIgnore.includes(edge)) {
                 console.log('Skipping', edge)
@@ -210,36 +210,38 @@ export default function Visualize(props) {
 
         for (const node of removeNodes) {
             console.log('remove node', node)
-            // setMsg('Removing nodes of type', node)
+            setTip('Removing nodes of type', node, '...')
             await py.remove_nodes_of_type(node)
         }
 
         for (const edge of removeEdges) {
             console.log('remove edge', edge)
-            // setMsg('Removing edges of type', edge)
+            setTip('Removing edges of type', edge, '...')
             await py.remove_edges_of_type(edge)
         }
 
         if (removeIsolates) {
             console.log('remove isolates')
-            // setMsg('Removing isolates')
+            setTip('Removing isolates...')
             const isolateCount = await py.count_isolates()
             await py.remove_isolates()
             console.log(`removed ${isolateCount} isolates`)
-            // setMsg(`Removed ${isolateCount} isolates`)
+            // setTip(`Removed ${isolateCount} isolates`)
         }
 
         console.log('finding connected components')
-        // setMsg('Finding connected components')
+        setTip('Finding connected components...')
         await py.add_connected_component_attr()
 
         console.log('adding degrees')
+        setTip('Calculating degrees...')
         await py.add_degree_attrs()
 
         console.log('adding metrics')
+        setTip('Calculating metrics...')
         await py.add_metric_attrs()
 
-        // setMsg('The graph is ready for visualization! Redirecting...')
+        setTip('The graph is ready for visualization!')
         console.log('done')
         console.log(await py.get_info())
 
@@ -259,16 +261,10 @@ export default function Visualize(props) {
         setCurrentNode(node)
     }, [])
 
-    if (!isPyReady) {
-        return 'Loading Python...'
-    }
+    const canRender = isPyReady && !dataLoading && graph && !graphLoading
 
-    if (dataLoading || !graph) {
-        return 'Downloading graph...'
-    }
-
-    if (graphLoading || !graph) {
-        return 'Loading graph...'
+    if (!canRender) {
+        return <LoadingPage tip={tip} />
     }
 
     console.log(params)
