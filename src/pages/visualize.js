@@ -83,11 +83,11 @@ function NodeInfos({ node }) {
             {metricsOptions.map(({ value, label }) => {
                 return (
                     <KVPair key={value} name={label}>
-                        {node[value].toFixed(3)}
+                        {node[value].toFixed(5)}
                     </KVPair>
                 )
             })}
-            <KVPair name={'weighted metric'}>{node.metric.toFixed(3)}</KVPair>
+            <KVPair name={'weighted metric'}>{node.metric.toFixed(5)}</KVPair>
         </>
     )
 }
