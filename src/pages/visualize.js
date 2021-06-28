@@ -87,7 +87,7 @@ function NodeInfos({ node }) {
                     </KVPair>
                 )
             })}
-            <KVPair name={'Weighted metric'}>{node.metric.toFixed(3)}</KVPair>
+            <KVPair name={'weighted metric'}>{node.metric.toFixed(3)}</KVPair>
         </>
     )
 }
