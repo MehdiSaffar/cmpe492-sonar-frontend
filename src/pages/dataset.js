@@ -100,19 +100,19 @@ export default function Dataset(props) {
                     <div>
                         Here you can find the articles of this list
                         <br />
-                        {fetchCount} <StatusTag type={'article'} status={'to_be_fetched'} /> 
-                        {processingCount} <StatusTag type={'article'} status={'to_be_processed'} /> 
-                        {doneCount} <StatusTag type={'article'} status={'done'} /> 
+                        {fetchCount} <StatusTag type={'article'} status={'to_be_fetched'} />
+                        {processingCount} <StatusTag type={'article'} status={'to_be_processed'} />
+                        {doneCount} <StatusTag type={'article'} status={'done'} />
                     </div>
                 }
                 onBack={() => router.history.push('/dashboard')}
                 extra={[
-                    <Button key="2" onClick={refresh}>
+                    <Button key="1" onClick={refresh}>
                         Refresh
                     </Button>,
                     <Button
-                        disabled={fetchCount !== 0 && processingCount !== 0}
-                        key="1"
+                        disabled={fetchCount !== 0 || processingCount !== 0}
+                        key="2"
                         type="primary"
                         onClick={onClickVisualize}
                     >
