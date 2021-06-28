@@ -160,7 +160,6 @@ function Graph({ size, graph, params, onClickNode }) {
     const [highLink, setHighLink] = useState()
 
     const [highNodes, highNodesFns] = useSet(new Set())
-    // const [highLinks, highLinksFns] = useSet(new Set())
 
     const onNodeHover = useCallback(
         node => {
@@ -192,8 +191,6 @@ function Graph({ size, graph, params, onClickNode }) {
 
     const isNodeHigh = useCallback(node => highNode === node.id || highNodesFns.has(node.id), [highNode, highNodes])
 
-    console.log(metricMin, metricMax)
-
     const nodeColor = useCallback(
         node => {
             const getNodeColor = node => {
@@ -221,7 +218,7 @@ function Graph({ size, graph, params, onClickNode }) {
                 }
 
                 if (nodeProps[highNode].component === node.component && !isNodeHigh(node)) {
-                    return hexOpacity(color, 0.1)
+                    return hexOpacity(color, 0.2)
                 }
 
                 return color
@@ -261,7 +258,7 @@ function Graph({ size, graph, params, onClickNode }) {
                     nodeProps[highNode].component === nodeProps[getLinkSourceIdSafely(link)].component &&
                     !isLinkHigh(link)
                 ) {
-                    return hexOpacity(color, 0.3)
+                    return hexOpacity(color, 0.2)
                 }
 
                 return color
@@ -312,8 +309,6 @@ function Graph({ size, graph, params, onClickNode }) {
         return ret
     }
 
-    console.log(graphData.links)
-
     const nodeCanvasObject = useCallback(
         (node, ctx, globalScale) => {
             // font size
@@ -353,12 +348,17 @@ function Graph({ size, graph, params, onClickNode }) {
             ctx.textBaseline = 'middle'
             // ctx.fillStyle = color
             // ctx.fillStyle = getUniqueColor(node.type)
-            ctx.fillStyle = nodeColorMap[node.type]
+            if (highNode && nodeProps[highNode].component === node.component && !isNodeHigh(node)) {
+                ctx.fillStyle = hexOpacity(nodeColorMap[node.type], 0.1)
+            } else {
+                ctx.fillStyle = nodeColorMap[node.type]
+            }
+
             ctx.fillText(label, node.x, node.y)
 
             node.__bckgDimensions = bckgDimensions // to re-use in nodePointerAreaPaint
         },
-        [highNode, highNodes]
+        [nodeProps, highNode, highNodes]
     )
 
     const nodePointerAreaPaint = useCallback((node, color, ctx) => {
@@ -373,11 +373,11 @@ function Graph({ size, graph, params, onClickNode }) {
         const target = ellipsis(getNodeName(link.target), 15)
 
         return `${source} <-> ${link.type}:${link.count ?? 1} <-> ${target}`
-    })
+    }, [])
 
     const onLinkHover = useCallback(link => {
         setHighLink(link)
-    })
+    }, [])
 
     return (
         <ForceGraph2D
