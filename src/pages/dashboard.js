@@ -160,7 +160,10 @@ export default function Dashboard(props) {
                 title="Dashboard"
                 subTitle="Here you can find all your submitted article lists"
                 extra={[
-                    <Button key={'1'} type="primary" onClick={show}>
+                    <Button key="1" onClick={refresh}>
+                        Refresh
+                    </Button>,
+                    <Button key="2" type="primary" onClick={show}>
                         Create
                     </Button>
                 ]}
