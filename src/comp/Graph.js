@@ -1,11 +1,9 @@
 import { interpolateYlGn } from 'd3-scale-chromatic'
-// import { interpolateTurbo as interpolateYlGn } from 'd3-scale-chromatic'
-// import { interpolatePlasma as interpolateYlGn } from 'd3-scale-chromatic'
 import hexOpacity from 'hex-color-opacity'
 import hexToRgba from 'hex-to-rgba'
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import { ForceGraph2D, ForceGraph3D } from 'react-force-graph'
-import { SizeMe, withSize } from 'react-sizeme'
+import useDimensions from 'react-use-dimensions'
 import rgbaToHex from 'rgb-hex'
 import ellipsis from 'text-ellipsis'
 
@@ -147,7 +145,7 @@ function filterNodeOfComponent(graph, componentFocused) {
     return graph
 }
 
-const Graph = forwardRef(({ size, graph, params, onClickNode, componentFocused }, ref) => {
+const Graph = forwardRef(({ graph, params, onClickNode, componentFocused }, ref) => {
     const graphData = useMemo(() => {
         console.log('componentFocused', componentFocused)
         let ret = toReactForceGraph(graph)
@@ -412,11 +410,9 @@ const Graph = forwardRef(({ size, graph, params, onClickNode, componentFocused }
         onClickNode()
     }, [])
 
-    const fgRef = useRef()
+    const [divRef, { width, height }] = useDimensions()
 
-    useImperativeHandle(ref, () => ({
-        zoomToFit: fgRef.current.zoomToFit
-    }))
+    const fgRef = useRef()
 
     const onEngineStop = useCallback(() => {
         fgRef.current.zoomToFit(400)
@@ -426,29 +422,37 @@ const Graph = forwardRef(({ size, graph, params, onClickNode, componentFocused }
         sleep(200).then(onEngineStop)
     }, [componentFocused])
 
+    useImperativeHandle(ref, () => ({
+        zoomToFit: fgRef.current.zoomToFit
+    }))
+
     return (
-        <ForceGraph2D
-            ref={fgRef}
-            {...size}
-            graphData={graphData}
-            nodeVal={10}
-            nodeColor={nodeColor}
-            linkColor={linkColor}
-            linkLabel={linkLabel}
-            onNodeClick={onClickNode}
-            onBackgroundClick={onBackgroundClick}
-            nodeVisibility={nodeVisibility}
-            // linkDirectionalParticles={linkDirectionalParticles}
-            // linkDirectionalParticleSpeed={linkDirectionalParticleSpeed}
-            nodeCanvasObject={nodeCanvasObject}
-            nodePointerAreaPaint={nodePointerAreaPaint}
-            linkWidth={linkWidth}
-            onNodeHover={onNodeHover}
-            onLinkHover={onLinkHover}
-            nodeResolution={1}
-            cooldownTicks={400}
-            // onEngineStop={onEngineStop}
-        />
+        <div ref={divRef}>
+            <ForceGraph2D
+                ref={fgRef}
+                width={width}
+                height={height}
+                // {...size}
+                graphData={graphData}
+                nodeVal={10}
+                nodeColor={nodeColor}
+                linkColor={linkColor}
+                linkLabel={linkLabel}
+                onNodeClick={onClickNode}
+                onBackgroundClick={onBackgroundClick}
+                nodeVisibility={nodeVisibility}
+                // linkDirectionalParticles={linkDirectionalParticles}
+                // linkDirectionalParticleSpeed={linkDirectionalParticleSpeed}
+                nodeCanvasObject={nodeCanvasObject}
+                nodePointerAreaPaint={nodePointerAreaPaint}
+                linkWidth={linkWidth}
+                onNodeHover={onNodeHover}
+                onLinkHover={onLinkHover}
+                nodeResolution={1}
+                cooldownTicks={400}
+                // onEngineStop={onEngineStop}
+            />
+        </div>
     )
 })
 

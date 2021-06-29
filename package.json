@@ -31,6 +31,7 @@
         "react-router-dom": "^5.2.0",
         "react-scripts": "4.0.3",
         "react-sizeme": "^3.0.1",
+        "react-use-dimensions": "^1.2.1",
         "rgb-hex": "^4.0.0",
         "text-ellipsis": "^1.0.3",
         "web-vitals": "^1.1.2",
