@@ -65,7 +65,7 @@ export default function Configure(props, b, c) {
         <div className="configure">
             <PageHeader
                 title={`Configure graph of article list ${id}`}
-                subTitle="Here you can find the articles of this list"
+                subTitle="Select the nodes and edges for the visualization"
                 onBack={() => router.history.push(`/dataset/${id}`)}
                 extra={[
                     <Button key="1" type="primary" disabled={!canSubmit} onClick={onVisualize}>
