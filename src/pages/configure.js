@@ -14,8 +14,8 @@ export default function Configure(props, b, c) {
     const router = useRouter()
     const id = router.match.params.id
 
-    const [nodes, setNodes] = useState([])
-    const [edges, setEdges] = useState([])
+    const [nodes, setNodes] = useState(['article', 'author', 'topic'])
+    const [edges, setEdges] = useState(['author_of', 'topic_of', 'coauthor'])
     const [removeIsolates, setRemoveIsolates] = useState(false)
 
     const onNodeChange = nodes => {
@@ -44,7 +44,7 @@ export default function Configure(props, b, c) {
 
     const canSubmit = nodes.length >= 1
 
-    const onConfirm = () => {
+    const onVisualize = () => {
         const query = {
             nodes,
             edges,
@@ -68,7 +68,7 @@ export default function Configure(props, b, c) {
                 subTitle="Here you can find the articles of this list"
                 onBack={() => router.history.push(`/dataset/${id}`)}
                 extra={[
-                    <Button key="1" type="primary" disabled={!canSubmit} onClick={onConfirm}>
+                    <Button key="1" type="primary" disabled={!canSubmit} onClick={onVisualize}>
                         Visualize
                     </Button>
                 ]}
@@ -92,8 +92,8 @@ export default function Configure(props, b, c) {
                 {removeIsolatesCheckbox}
                 <br />
                 <br />
-                <Button disabled={!canSubmit} type="primary" onClick={onConfirm}>
-                    Confirm
+                <Button disabled={!canSubmit} type="primary" onClick={onVisualize}>
+                    Visualize
                 </Button>
             </div>
         </div>
