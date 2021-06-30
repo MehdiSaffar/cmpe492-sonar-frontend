@@ -239,3 +239,9 @@ export const getUniqueColor = o => {
 export function getDoiUrl(doi) {
     return `https://doi.org/${doi}`
 }
+
+export const nodeColorMap = {
+    article: '#0000FF',
+    author: '#FF0000',
+    topic: '#696969'
+}

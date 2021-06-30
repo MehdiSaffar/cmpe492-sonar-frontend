@@ -3,18 +3,19 @@
     height: 100%;
     width: 100%;
     max-width: 100%;
+    max-height: 100%;
     overflow: hidden;
 
-    grid-template-columns: 10fr minmax(300px, 4fr);
+    grid-template-columns: 10fr 400px;
 
     .graph {
+        height: 100%;
+        max-height: 100%;
         overflow: hidden;
         background-color: white;
     }
 
     .side {
-
-
         overflow: auto;
         padding: 8px;
         background-color: #aed99a;
@@ -28,27 +29,60 @@
             }
         }
 
-        > div {
-            border-radius: 8px;
-            padding: 16px;
-            background: rgba(255, 255, 255, 0.2);
+        .side-top {
+            display: flex;
+            flex-direction: column;
+            flex-wrap: wrap;
+            gap: 8px;
+            width: 100%;
+            > div {
+                gap: 8px;
+                width: 100%;
+                display: flex;
+            }
         }
 
-        .node-details {
-            h1,
-            h2,
-            h3 {
-                margin-bottom: 0.1cm;
+        .side-main {
+            padding: 8px;
+            background-color: #aed99a;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            > div {
+                border-radius: 8px;
+                padding: 16px;
+                background: rgba(255, 255, 255, 0.2);
             }
-            h1 ~ * {
-                margin-left: 8px;
-            }
-            h2 ~ * {
-                margin-left: 16px;
-            }
-            h3 ~ * {
-                margin-left: 24px;
+
+            .node-details {
+                h1,
+                h2,
+                h3 {
+                    margin-bottom: 0.1cm;
+                }
+                h1 ~ * {
+                    margin-left: 8px;
+                }
+                h2 ~ * {
+                    margin-left: 16px;
+                }
+                h3 ~ * {
+                    margin-left: 24px;
+                }
             }
         }
     }
+}
+
+.color-legend {
+    width: 100%;
+    display: flex;
+    gap: 10px;
+    .color {
+        display: inline;
+        width: 20px;
+        height: 20px;
+        border: 1px solid black;
+    }
+
 }

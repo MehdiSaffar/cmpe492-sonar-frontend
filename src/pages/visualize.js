@@ -1,5 +1,6 @@
 import './visualize.less'
 
+import { DownloadOutlined, ExpandOutlined, FullscreenOutlined, SettingOutlined } from '@ant-design/icons'
 import { Button, Form, InputNumber, Select, Slider } from 'antd'
 import qs from 'query-string'
 import React, { useCallback, useRef, useState } from 'react'
@@ -14,6 +15,8 @@ import {
     edgeOptions,
     formatArticleListGraphResponse,
     formatDate,
+    getUniqueColor,
+    nodeColorMap,
     nodeOptions
 } from '../utils'
 
@@ -68,6 +71,15 @@ function KVPair({ name, children }) {
     return (
         <div>
             <b>{name}:</b> {children}
+        </div>
+    )
+}
+
+function ColorLegend({ color, children }) {
+    return (
+        <div className="color-legend">
+            <div className="color" style={{ backgroundColor: color }}></div>
+            <span>{children}</span>
         </div>
     )
 }
@@ -277,9 +289,35 @@ export default function Visualize(props) {
         graphRef.current.zoomToFit(400)
     }, [graphRef])
 
+    const onClickConfigure = useCallback(() => {
+        router.push(`/configure/${id}`)
+    }, [id])
+
+    const onClickExport = useCallback(() => {
+        // Create blob link to download
+        const obj = graphRef.current.export()
+        const blob = new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json' })
+        const url = window.URL.createObjectURL(blob)
+
+        const link = document.createElement('a')
+        link.href = url
+        link.setAttribute('download', `article-list-${id}.json`)
+
+        // Append to html link element page
+        document.body.appendChild(link)
+
+        // Start download
+        link.click()
+
+        // Clean up and remove the link
+        link.parentNode.removeChild(link)
+    }, [graphRef, id])
+
     if (!canRender) {
         return <LoadingPage tip={tip} />
     }
+
+    // return null
 
     return (
         <div className="visualize">
@@ -293,16 +331,43 @@ export default function Visualize(props) {
                 />
             </div>
             <div className="side">
-                {currentNode !== undefined && currentNode.component !== componentFocused && (
-                    <Button onClick={onFocusComponent(currentNode.component)}>Focus on connected component</Button>
-                )}
-                {componentFocused !== undefined && <Button onClick={onFocusComponent()}>Focus on entire graph</Button>}
-                <Button onClick={onZoomToFit}>Zoom to Fit</Button>
-                <NodeDetails node={currentNode} />
-                <div>
-                    <h1>Graph visualization</h1>
-                    <Form form={form} {...formItemLayout} preserve onFinish={setParams} initialValues={initialValues}>
-                        {/* Connected components
+                <div className="side-top">
+                    <div>
+                        <Button type="primary" onClick={onClickConfigure} block icon={<SettingOutlined />}>
+                            Configure
+                        </Button>
+                        <Button type="primary" onClick={onClickExport} block icon={<DownloadOutlined />}>
+                            Export
+                        </Button>
+                        <Button onClick={onZoomToFit} block icon={<FullscreenOutlined />}>
+                            Zoom to Fit
+                        </Button>
+                    </div>
+                    <div>
+                        {currentNode !== undefined && currentNode.component !== componentFocused && (
+                            <Button onClick={onFocusComponent(currentNode.component)} block icon={<ExpandOutlined />}>
+                                Focus on connected component
+                            </Button>
+                        )}
+                        {componentFocused !== undefined && (
+                            <Button onClick={onFocusComponent()} block icon={<FullscreenOutlined />}>
+                                Focus on entire graph
+                            </Button>
+                        )}
+                    </div>
+                </div>
+                <div className="side-main">
+                    <NodeDetails node={currentNode} />
+                    <div>
+                        <h1>Graph visualization</h1>
+                        <Form
+                            form={form}
+                            {...formItemLayout}
+                            preserve
+                            onFinish={setParams}
+                            initialValues={initialValues}
+                        >
+                            {/* Connected components
                         <Form.Item name={'connectedComponentCount'} label="Top Conn. Comps">
                             <Slider
                                 min={1}
@@ -312,25 +377,40 @@ export default function Visualize(props) {
                                 // onChange={setConnectedComponentCount}
                             />
                         </Form.Item> */}
-                        Coloring
-                        <Form.Item name={'colorNodeBy'} label="Color node by">
-                            <Select options={colorNodeByOptions} />
-                        </Form.Item>
-                        <Form.Item name={'colorEdgeBy'} label="Color edge by">
-                            <Select options={colorEdgeByOptions} />
-                        </Form.Item>
-                        Centrality metrics
-                        {metricsOptions.map(({ value, label }) => {
+                            Coloring
+                            <Form.Item name={'colorNodeBy'} label="Color node by">
+                                <Select options={colorNodeByOptions} />
+                            </Form.Item>
+                            <Form.Item name={'colorEdgeBy'} label="Color edge by">
+                                <Select options={colorEdgeByOptions} />
+                            </Form.Item>
+                            Centrality metrics
+                            {metricsOptions.map(({ value, label }) => {
+                                return (
+                                    <Form.Item key={value} name={['metrics', value]} label={label}>
+                                        <InputNumber min={0} max={100} />
+                                    </Form.Item>
+                                )
+                            })}
+                            <Button htmlType="submit" type="primary">
+                                Confirm
+                            </Button>
+                        </Form>
+                    </div>
+                    <div>
+                        <h1>Legend</h1>
+                        <ColorLegend color={nodeColorMap['article']}>Article node</ColorLegend>
+                        <ColorLegend color={nodeColorMap['author']}>Author node</ColorLegend>
+                        <ColorLegend color={nodeColorMap['topic']}>Topic node</ColorLegend>
+                        <br />
+                        {edgeOptions.map(o => {
                             return (
-                                <Form.Item key={value} name={['metrics', value]} label={label}>
-                                    <InputNumber min={0} max={100} />
-                                </Form.Item>
+                                <ColorLegend key={o.value} color={getUniqueColor(o.value)}>
+                                    {o.label} link
+                                </ColorLegend>
                             )
                         })}
-                        <Button htmlType="submit" type="primary">
-                            Confirm
-                        </Button>
-                    </Form>
+                    </div>
                 </div>
             </div>
         </div>

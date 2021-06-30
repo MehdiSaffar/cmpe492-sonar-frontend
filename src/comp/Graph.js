@@ -8,13 +8,7 @@ import rgbaToHex from 'rgb-hex'
 import ellipsis from 'text-ellipsis'
 
 import { useSet } from '../hooks'
-import { getRange, getUniqueColor, sleep } from '../utils'
-
-const nodeColorMap = {
-    article: '#0000FF',
-    author: '#FF0000',
-    topic: '#696969'
-}
+import { getRange, getUniqueColor, nodeColorMap, sleep } from '../utils'
 
 // const edgeColor = {
 //     author_of: 'orange',
@@ -146,6 +140,13 @@ function filterNodeOfComponent(graph, componentFocused) {
 }
 
 const Graph = forwardRef(({ graph, params, onClickNode, componentFocused }, ref) => {
+    const [divRef, { width, height }] = useDimensions()
+    const fgRef = useRef()
+
+    useEffect(() => {
+        sleep(300).then(() => fgRef.current.zoomToFit(400))
+    }, [componentFocused])
+
     const graphData = useMemo(() => {
         console.log('componentFocused', componentFocused)
         let ret = toReactForceGraph(graph)
@@ -154,6 +155,13 @@ const Graph = forwardRef(({ graph, params, onClickNode, componentFocused }, ref)
         }
         return ret
     }, [graph, componentFocused])
+
+    useImperativeHandle(ref, () => ({
+        zoomToFit: fgRef.current.zoomToFit,
+        export: () => {
+            return graphData
+        }
+    }))
 
     const adjList = useMemo(() => getAdjList(graphData.links), [graphData])
 
@@ -410,29 +418,16 @@ const Graph = forwardRef(({ graph, params, onClickNode, componentFocused }, ref)
         onClickNode()
     }, [])
 
-    const [divRef, { width, height }] = useDimensions()
-
-    const fgRef = useRef()
-
-    const onEngineStop = useCallback(() => {
-        fgRef.current.zoomToFit(400)
-    }, [fgRef])
-
-    useEffect(() => {
-        sleep(200).then(onEngineStop)
-    }, [componentFocused])
-
-    useImperativeHandle(ref, () => ({
-        zoomToFit: fgRef.current.zoomToFit
-    }))
+    // const onEngineStop = useCallback(() => {
+    //     fgRef.current.zoomToFit(400)
+    // }, [fgRef])
 
     return (
-        <div ref={divRef}>
+        <div style={{ height: '100%' }} ref={divRef}>
             <ForceGraph2D
                 ref={fgRef}
                 width={width}
                 height={height}
-                // {...size}
                 graphData={graphData}
                 nodeVal={10}
                 nodeColor={nodeColor}
@@ -441,8 +436,6 @@ const Graph = forwardRef(({ graph, params, onClickNode, componentFocused }, ref)
                 onNodeClick={onClickNode}
                 onBackgroundClick={onBackgroundClick}
                 nodeVisibility={nodeVisibility}
-                // linkDirectionalParticles={linkDirectionalParticles}
-                // linkDirectionalParticleSpeed={linkDirectionalParticleSpeed}
                 nodeCanvasObject={nodeCanvasObject}
                 nodePointerAreaPaint={nodePointerAreaPaint}
                 linkWidth={linkWidth}
@@ -450,12 +443,9 @@ const Graph = forwardRef(({ graph, params, onClickNode, componentFocused }, ref)
                 onLinkHover={onLinkHover}
                 nodeResolution={1}
                 cooldownTicks={400}
-                // onEngineStop={onEngineStop}
             />
         </div>
     )
 })
 
 export default Graph
-
-// export default withSize({ monitorHeight: true, monitorWidth: true, noPlaceholder: false })(Graph)
