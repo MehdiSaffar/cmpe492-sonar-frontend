@@ -88,18 +88,18 @@ function NodeInfos({ node }) {
     return (
         <>
             <h2>Info</h2>
-            <KVPair name={'Degree'}>{node.degree}</KVPair>
-            <KVPair name={'Component index'}>{node.component}</KVPair>
+            <KVPair name={'Degree'}>{node?.degree}</KVPair>
+            <KVPair name={'Component index'}>{node?.component}</KVPair>
 
             <h3>Metrics</h3>
             {metricsOptions.map(({ value, label }) => {
                 return (
                     <KVPair key={value} name={label}>
-                        {node[value].toFixed(5)}
+                        {node[value]?.toFixed(5)}
                     </KVPair>
                 )
             })}
-            <KVPair name={'weighted metric'}>{node.metric.toFixed(5)}</KVPair>
+            <KVPair name={'weighted metric'}>{node.metric?.toFixed(5)}</KVPair>
         </>
     )
 }

@@ -133,7 +133,7 @@ class App:
             # 'betweenness_centrality': nx.betweenness_centrality, PROBLEM
             # 'communicability_centrality': nx.communicability_centrality, MISSING
             'load_centrality': nx.load_centrality,
-            # 'subgraph_centrality': nx.subgraph_centrality,
+            # 'subgraph_centrality': nx.subgraph_centrality, TOO BIG VALUES
             'harmonic_centrality': nx.harmonic_centrality,
             # 'voterank': nx.voterank, PROBLEM
         }
@@ -143,7 +143,11 @@ class App:
         cn_info = self.get_connected_components_info()
 
         for metric_key, metric_fn in switcher.items():
-            values[metric_key] = metric_fn(self.g)
+            try:
+                values[metric_key] = metric_fn(self.g)
+            except Exception:
+                values[metric_key] = 0
+
 
         for metric_key, metric_values in values.items():
             for metric_node, metric_value in metric_values.items():

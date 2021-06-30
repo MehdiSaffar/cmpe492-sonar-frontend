@@ -3,7 +3,7 @@ importScripts('https://cdn.jsdelivr.net/pyodide/v0.17.0/full/pyodide.js')
 // let app
 export async function init_pyodide() {
     await loadPyodide({ indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.17.0/full/' })
-    await pyodide.loadPackage(['networkx'])
+    await pyodide.loadPackage(['scipy', 'networkx'])
 }
 
 export async function load_app(main_py) {
