@@ -399,6 +399,8 @@ export default function Visualize(props) {
                     </div>
                     <div>
                         <h1>Legend</h1>
+                        <KVPair name={'Node count'}>{graph?.nodes?.length}</KVPair>
+                        <KVPair name={'Edge count'}>{graph?.edges?.length}</KVPair>
                         <ColorLegend color={nodeColorMap['article']}>Article node</ColorLegend>
                         <ColorLegend color={nodeColorMap['author']}>Author node</ColorLegend>
                         <ColorLegend color={nodeColorMap['topic']}>Topic node</ColorLegend>

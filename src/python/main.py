@@ -145,8 +145,8 @@ class App:
         for metric_key, metric_fn in switcher.items():
             try:
                 values[metric_key] = metric_fn(self.g)
-            except Exception:
-                values[metric_key] = 0
+            except BaseException:
+                values[metric_key] = {node:0 for node in self.g.nodes()}
 
 
         for metric_key, metric_values in values.items():

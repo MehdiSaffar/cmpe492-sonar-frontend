@@ -170,10 +170,24 @@ const Graph = forwardRef(({ graph, params, onClickNode, componentFocused }, ref)
         return createNodesHashmap(nodes)
     }, [graphData, params.metrics])
 
-    const [metricMin, metricMax] = useMemo(() => {
-        let values = Object.values(nodeProps).map(x => x.metric)
-        return getRange(values)
-    }, [nodeProps])
+    // [metricMin, metricMax]
+    const metricProps = useMemo(() => {
+        // let values = Object.values(nodeProps).map(x => x.metric)
+
+        const componentIxs = new Set(graphData.nodes.map(n => n.component))
+
+        // console.log(componentIxs)
+        const obj = {}
+
+        for (let c of componentIxs) {
+            obj[c] = getRange(graphData.nodes.filter(n => n.component === c).map(n => nodeProps[n.id].metric))
+        }
+        // console.log(obj)
+
+        return obj
+
+        // return getRange(values)
+    }, [params.metrics, nodeProps, graphData])
 
     const [linkCountMin, linkCountMax] = useMemo(() => {
         let values = graphData.links.map(link => link.count ?? 1)
@@ -229,6 +243,7 @@ const Graph = forwardRef(({ graph, params, onClickNode, componentFocused }, ref)
 
                 if (params.colorNodeBy === 'metric') {
                     let value = nodeProps[node.id].metric
+                    let [metricMin, metricMax] = metricProps[nodeProps[node.id].component]
                     value = (value - metricMin) / (metricMax - metricMin)
                     return '#' + rgbaToHex(interpolateYlGn(value))
                 }
