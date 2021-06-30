@@ -9,6 +9,10 @@ import App from './App'
 import { AppContextProvider } from './context/AppContext'
 import reportWebVitals from './reportWebVitals'
 
+if (!process.env.NODE_ENV || process.env.NODE_ENV !== 'development') {
+    console.log = function () {}
+}
+
 ReactDOM.render(
     <Auth0Provider
         domain={process.env.REACT_APP_AUTH0_DOMAIN}
