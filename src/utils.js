@@ -116,15 +116,15 @@ export const etv = fn => event => fn(event.target.value)
 export const statusMappings = {
     article_list: {
         phase_1: {
-            displayName: 'Phase 1',
+            displayName: 'Preparing',
             color: 'cyan'
         },
         phase_2: {
-            displayName: 'Phase 2',
-            color: 'blue'
+            displayName: 'Preparing',
+            color: 'cyan'
         },
         done: {
-            displayName: 'Done',
+            displayName: 'Ready',
             color: 'green'
         }
     },
