@@ -14,7 +14,7 @@ import { callApi, etv, parseDoiList, sleep } from '../utils'
 
 const { Dragger } = Upload
 
-const columns = ({ onDeleteClicked, deleteLoading = false } = {}) => [
+const columns = ({ onDeleteClicked, onVisualizeClicked, deleteLoading = false } = {}) => [
     {
         title: 'Status',
         dataIndex: 'status',
@@ -28,16 +28,16 @@ const columns = ({ onDeleteClicked, deleteLoading = false } = {}) => [
         dataIndex: 'title',
         key: 'title'
     },
-    {
-        title: 'Owner',
-        dataIndex: 'owner',
-        key: 'owner'
-    },
-    {
-        title: 'Articles',
-        dataIndex: 'articles',
-        key: 'articles'
-    },
+    // {
+    //     title: 'Owner',
+    //     dataIndex: 'owner',
+    //     key: 'owner'
+    // },
+    // {
+    //     title: 'Articles',
+    //     dataIndex: 'articles',
+    //     key: 'articles'
+    // },
     {
         title: 'Actions',
         key: 'actions',
@@ -46,6 +46,9 @@ const columns = ({ onDeleteClicked, deleteLoading = false } = {}) => [
                 <div>
                     <Button danger loading={deleteLoading} onClick={onDeleteClicked(row.id)}>
                         Delete
+                    </Button>
+                    <Button primary onClick={onVisualizeClicked(row.id)}>
+                        Visualize
                     </Button>
                 </div>
             )
@@ -154,6 +157,10 @@ export default function Dashboard(props) {
         refresh()
     }
 
+    const onVisualizeClicked = id => () => {
+        router.push(`/configure/${id}`)
+    }
+
     return (
         <div>
             <PageHeader
@@ -177,7 +184,7 @@ export default function Dashboard(props) {
                     }
                 }}
                 dataSource={data}
-                columns={columns({ onDeleteClicked, deleteLoading })}
+                columns={columns({ onDeleteClicked, onVisualizeClicked, deleteLoading })}
                 id={'id'}
             ></Table>
             {visible && <CreateDOIListModal onOk={onOk} onCancel={hide} />}
