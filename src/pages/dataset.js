@@ -74,22 +74,24 @@ export default function Dataset(props) {
         processData: formatArticleListResponse
     })
 
-    const [fetchCount, processingCount, doneCount] = useMemo(() => {
+    const [failedCount, fetchCount, processingCount, doneCount] = useMemo(() => {
         if (!dataset) {
             return []
         }
 
+        let failedCount = 0
         let fetchCount = 0
         let processingCount = 0
         let doneCount = 0
 
         for (let article of dataset) {
+            failedCount += article.status == 'failed'
             fetchCount += article.status == 'to_be_fetched'
             processingCount += article.status == 'to_be_processed'
             doneCount += article.status == 'done'
         }
 
-        return [fetchCount, processingCount, doneCount]
+        return [failedCount, fetchCount, processingCount, doneCount]
     }, [dataset])
 
     console.log(dataset)
@@ -106,6 +108,7 @@ export default function Dataset(props) {
                     <div>
                         Here you can find the articles of this list
                         <br />
+                        {failedCount} <StatusTag type={'article'} status={'failed'} />
                         {fetchCount} <StatusTag type={'article'} status={'to_be_fetched'} />
                         {processingCount} <StatusTag type={'article'} status={'to_be_processed'} />
                         {doneCount} <StatusTag type={'article'} status={'done'} />
@@ -127,7 +130,7 @@ export default function Dataset(props) {
                 ]}
             />
             <h1>{loading ? 'Loading...' : dataset?.title ?? 'Article List'}</h1>
-            <Table loading={loading} dataSource={dataset} columns={columns} id={'id'}></Table>
+            <Table loading={loading} dataSource={dataset} columns={columns} id={'doi'} />
         </div>
     )
 }

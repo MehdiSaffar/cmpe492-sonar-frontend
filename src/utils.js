@@ -129,6 +129,10 @@ export const statusMappings = {
         }
     },
     article: {
+        failed: {
+            displayName: 'Failed',
+            color: 'red'
+        },
         to_be_fetched: {
             displayName: 'Fetching',
             color: 'cyan'

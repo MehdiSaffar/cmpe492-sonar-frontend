@@ -2,15 +2,13 @@ import './dashboard.less'
 
 import { InboxOutlined } from '@ant-design/icons'
 import FileReader from '@tanker/file-reader'
-import { Button, Form, Input, Modal, notification, PageHeader, Table, Tag, Upload } from 'antd'
-// import router from 'next/router'
-import { useEffect, useState } from 'react'
+import { Button, Form, Input, Modal, PageHeader, Table, Upload } from 'antd'
+import { useState } from 'react'
 
-import api from '../api'
 import StatusTag from '../comp/StatusTag'
 import { useShow } from '../hooks'
 import { useApi, useRouter } from '../hooks'
-import { callApi, etv, parseDoiList, sleep } from '../utils'
+import { callApi, etv, parseDoiList } from '../utils'
 
 const { Dragger } = Upload
 
@@ -43,12 +41,12 @@ const columns = ({ onDeleteClicked, onVisualizeClicked, deleteLoading = false } 
         key: 'actions',
         render: row => {
             return (
-                <div>
-                    <Button danger loading={deleteLoading} onClick={onDeleteClicked(row.id)}>
-                        Delete
-                    </Button>
-                    <Button primary onClick={onVisualizeClicked(row.id)}>
+                <div style={{ display: 'flex', gap: 16 }}>
+                    <Button type="primary" onClick={etv(onVisualizeClicked(row.id))}>
                         Visualize
+                    </Button>
+                    <Button danger loading={deleteLoading} onClick={etv(onDeleteClicked(row.id))}>
+                        Delete
                     </Button>
                 </div>
             )
