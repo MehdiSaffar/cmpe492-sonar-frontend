@@ -66,7 +66,7 @@ export default function App(props) {
             }
         }
         _initApp()
-        // _initPython()
+        _initPython()
     }, [])
 
     // return <LoadingPage />
