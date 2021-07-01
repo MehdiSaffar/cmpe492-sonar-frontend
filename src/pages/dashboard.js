@@ -8,7 +8,7 @@ import { useState } from 'react'
 import StatusTag from '../comp/StatusTag'
 import { useShow } from '../hooks'
 import { useApi, useRouter } from '../hooks'
-import { callApi, etv, parseDoiList } from '../utils'
+import { callApi, etv, formatArticleListsResponse, parseDoiList, renderDateToNow } from '../utils'
 
 const { Dragger } = Upload
 
@@ -31,11 +31,17 @@ const columns = ({ onDeleteClicked, onVisualizeClicked, deleteLoading = false } 
     //     dataIndex: 'owner',
     //     key: 'owner'
     // },
-    // {
-    //     title: 'Articles',
-    //     dataIndex: 'articles',
-    //     key: 'articles'
-    // },
+    {
+        title: 'Articles',
+        dataIndex: 'number_of_articles',
+        key: 'articles'
+    },
+    {
+        title: 'Created at',
+        dataIndex: 'created_date',
+        key: 'created_date',
+        render: renderDateToNow
+    },
     {
         title: 'Actions',
         key: 'actions',
@@ -133,7 +139,7 @@ export default function Dashboard(props) {
     const [deleteLoading, setDeleteLoading] = useState(false)
 
     const [data, loading, refresh] = useApi('get', '/article-lists/', {
-        processData: data => data.result
+        processData: formatArticleListsResponse
     })
 
     const [visible, show, hide] = useShow(false)

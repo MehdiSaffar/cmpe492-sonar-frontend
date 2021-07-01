@@ -75,7 +75,7 @@ export default function Dataset(props) {
     })
 
     const [failedCount, fetchCount, processingCount, doneCount] = useMemo(() => {
-        if (!dataset) {
+        if (!dataset?.articles) {
             return []
         }
 
@@ -84,7 +84,7 @@ export default function Dataset(props) {
         let processingCount = 0
         let doneCount = 0
 
-        for (let article of dataset) {
+        for (let article of dataset.articles) {
             failedCount += article.status == 'failed'
             fetchCount += article.status == 'to_be_fetched'
             processingCount += article.status == 'to_be_processed'
@@ -129,8 +129,8 @@ export default function Dataset(props) {
                     </Button>
                 ]}
             />
-            <h1>{loading ? 'Loading...' : dataset?.title ?? 'Article List'}</h1>
-            <Table loading={loading} dataSource={dataset} columns={columns} id={'doi'} />
+            <h1>{loading ? 'Loading...' : dataset?.article_list?.title ?? 'Article List'}</h1>
+            <Table loading={loading} dataSource={dataset?.articles} columns={columns} id={'doi'} />
         </div>
     )
 }

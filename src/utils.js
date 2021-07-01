@@ -148,9 +148,17 @@ export const statusMappings = {
     }
 }
 
+export function formatArticleListsResponse(r) {
+    r = r.result
+    r.forEach(l => {
+        l.created_date = newDateOrKeep(l.created_date)
+    })
+    return r
+}
+
 export function formatArticleListResponse(r) {
     r = r.result
-    r.forEach(a => {
+    r.articles.forEach(a => {
         a.title = a.title === '' ? null : a.title
         a.created_date = newDateOrKeep(a.created_date)
         a.fetched_date = newDateOrKeep(a.fetched_date)
